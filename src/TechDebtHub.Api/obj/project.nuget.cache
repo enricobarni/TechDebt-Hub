@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "VZbReZECNmA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\enric\\source\\repos\\TechDebt Hub\\BACKEND\\src\\TechDebtHub.Api\\TechDebtHub.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\enric\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.10\\microsoft.aspnetcore.openapi.10.0.10.nupkg.sha512",
+    "C:\\Users\\enric\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
+  ],
+  "logs": []
+}

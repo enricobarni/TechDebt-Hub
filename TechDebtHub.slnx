@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TechDebtHub.Api/TechDebtHub.Api.csproj" />
+    <Project Path="src/TechDebtHub.Application/TechDebtHub.Application.csproj" />
+    <Project Path="src/TechDebtHub.Domain/TechDebtHub.Domain.csproj" />
+    <Project Path="src/TechDebtHub.Infrastructure/TechDebtHub.Infrastructure.csproj" />
+  </Folder>
+</Solution>

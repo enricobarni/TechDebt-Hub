@@ -1,0 +1,15 @@
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\bin\Debug\net10.0\TechDebtHub.Application.deps.json
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\bin\Debug\net10.0\TechDebtHub.Application.dll
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\bin\Debug\net10.0\TechDebtHub.Application.pdb
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\bin\Debug\net10.0\TechDebtHub.Domain.dll
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\bin\Debug\net10.0\TechDebtHub.Domain.pdb
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.csproj.AssemblyReference.cache
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.AssemblyInfoInputs.cache
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.AssemblyInfo.cs
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.csproj.CoreCompileInputs.cache
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebt.AAA578EC.Up2Date
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.dll
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\refint\TechDebtHub.Application.dll
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\TechDebtHub.Application.pdb
+C:\Users\enric\source\repos\TechDebt Hub\BACKEND\src\TechDebtHub.Application\obj\Debug\net10.0\ref\TechDebtHub.Application.dll
