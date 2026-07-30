@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Domain.Entities;
 
-namespace TechDebtHub.Application.Features.CriarProjeto
+namespace TechDebtHub.Application.Features.Projetos.CriarProjeto
 {
     public sealed class CriarProjetoHandler
     {
