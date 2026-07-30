@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TechDebtHub.Application;
 using TechDebtHub.Infrastructure;
 using TechDebtHub.Infrastructure.Persistence;
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
