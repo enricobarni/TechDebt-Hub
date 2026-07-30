@@ -38,7 +38,7 @@ namespace TechDebtHub.Api.Controllers
             return CreatedAtAction(nameof(BuscarPorId), new {id = response.Id}, response);
         }
 
-        [HttpGet("{id:guide}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<BuscarPorIdResponse>> BuscarPorId(
             Guid id,
             CancellationToken cancellationToken
