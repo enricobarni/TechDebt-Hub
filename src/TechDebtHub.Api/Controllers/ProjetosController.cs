@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
+using TechDebtHub.Application.Features.Projetos.BuscarPorId;
 using TechDebtHub.Application.Features.Projetos.CriarProjeto;
 
 namespace TechDebtHub.Api.Controllers
@@ -13,10 +14,15 @@ namespace TechDebtHub.Api.Controllers
     public sealed class ProjetosController : ControllerBase
     {
         private readonly CriarProjetoHandler _criarProjetoHandler;
+        private readonly BuscarPorIdHandler _buscarPorIdHandler;
 
-        public ProjetosController(CriarProjetoHandler criarProjetoHandler)
+        public ProjetosController(
+            CriarProjetoHandler criarProjetoHandler,
+            BuscarPorIdHandler buscarPorIdHandler
+        )
         {
             _criarProjetoHandler = criarProjetoHandler;
+            _buscarPorIdHandler = buscarPorIdHandler;
         }
 
         [HttpPost]
@@ -29,7 +35,20 @@ namespace TechDebtHub.Api.Controllers
 
             var response = await _criarProjetoHandler.HandleAsync(command, cancellationToken);
 
-            return StatusCode(StatusCodes.Status201Created, response);
+            return CreatedAtAction(nameof(BuscarPorId), new {id = response.Id}, response);
+        }
+
+        [HttpGet("{id:guide}")]
+        public async Task<ActionResult<BuscarPorIdResponse>> BuscarPorId(
+            Guid id,
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new BuscarPorIdQuery(id);
+
+            var response = await _buscarPorIdHandler.HandlerAsync(query, cancellationToken);
+
+            return Ok(response);
         }
     }
 }
