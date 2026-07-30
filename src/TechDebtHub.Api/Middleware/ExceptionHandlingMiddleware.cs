@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Application.Exceptions;
 using TechDebtHub.Domain.Exceptions;
 
@@ -28,48 +29,88 @@ namespace TechDebtHub.Api.Middleware
             {
                 await _next(context);
             }
-            catch (NotFoundException exception)
+            catch (NotFoundException ex)
             {
-                await WriteResponseAsync(context, StatusCodes.Status404NotFound, exception.Message);
+                await HandleExceptionAsync(
+                    context,
+                    StatusCodes.Status404NotFound,
+                    title: "Recurso Não Encontrado",
+                    detail: ex.Message
+                );
             }
-            catch (DomainException exception)
+            catch (ValidationException ex)
             {
-                await WriteResponseAsync(
+                await HandleValidationExceptionAsync(context, ex);
+            }
+            catch (DomainException ex)
+            {
+                await HandleExceptionAsync(
                     context,
                     StatusCodes.Status422UnprocessableEntity,
-                    exception.Message
+                    title: "Regra de Negócio Violada",
+                    detail: ex.Message
                 );
             }
-            catch (ArgumentException exeption)
+            catch (ArgumentException ex)
             {
-                await WriteResponseAsync(
+                await HandleExceptionAsync(
                     context,
                     StatusCodes.Status400BadRequest,
-                    exeption.Message
+                    title: "Requisição Inválida",
+                    detail: ex.Message
                 );
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                _logger.LogError(exception, "Ocorreu um erro não tratado");
+                _logger.LogError(ex, "Ocorreu um erro não tratado no servidor");
 
-                await WriteResponseAsync(
+                await HandleExceptionAsync(
                     context,
                     StatusCodes.Status500InternalServerError,
-                    "Ocorreu um erro interno"
+                    title: "Ocorreu um erro interno",
+                    detail: "Ocorreu um erro inesperado no servidor. Tente novamente mais tarde."
                 );
             }
         }
 
-        private static async Task WriteResponseAsync(
+        private static async Task HandleExceptionAsync(
             HttpContext context,
             int statusCode,
-            string message
+            string title,
+            string detail
         )
         {
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/problem+json";
 
-            await context.Response.WriteAsJsonAsync(new { status = statusCode, error = message });
+            var problemDetails = new ProblemDetails
+            {
+                Status = statusCode,
+                Title = title,
+                Detail = detail,
+                Instance = context.Request.Path,
+            };
+
+            await context.Response.WriteAsJsonAsync(problemDetails);
+        }
+
+        private static async Task HandleValidationExceptionAsync(
+            HttpContext context,
+            ValidationException ex
+        )
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/problem+json";
+
+            var problemDetail = new HttpValidationProblemDetails(ex.Errors)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Erro de validação",
+                Detail = ex.Message,
+                Instance = context.Request.Path,
+            };
+
+            await context.Response.WriteAsJsonAsync(problemDetail);
         }
     }
 }

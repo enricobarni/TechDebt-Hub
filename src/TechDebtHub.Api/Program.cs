@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TechDebtHub.Api;
+using TechDebtHub.Api.Extensions;
 using TechDebtHub.Application;
 using TechDebtHub.Infrastructure;
 using TechDebtHub.Infrastructure.Persistence;
@@ -10,16 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddApi();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseExceptionHandling();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
