@@ -29,13 +29,7 @@ namespace TechDebtHub.Api.Controllers
 
             var response = await _criarProjetoHandler.HandleAsync(command, cancellationToken);
 
-            return CreatedAtAction(nameof(BuscarPorId), new { id = response.Id }, response);
-        }
-
-        [HttpGet]
-        public IActionResult BuscarPorId(Guid Id)
-        {
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, response);
         }
     }
 }
