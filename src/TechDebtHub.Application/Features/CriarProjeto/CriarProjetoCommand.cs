@@ -5,8 +5,5 @@ using System.Threading.Tasks;
 
 namespace TechDebtHub.Application.Features.CriarProjeto
 {
-    public class CriarProjetoCommand
-    {
-        
-    }
+    public sealed record CriarProjetoCommand(string Nome, string Descricao);
 }

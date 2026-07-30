@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace TechDebtHub.Application.Features.CriarProjeto
 {
-    public class CriarProjetoResponse
-    {
-        
-    }
+    public sealed record CriarProjetoResponse(
+        Guid Id,
+        string Nome,
+        string Descricao,
+        DateTime DataCriacao
+    );
 }
