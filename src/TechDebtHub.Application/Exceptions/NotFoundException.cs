@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace TechDebtHub.Application.Exceptions
 {
-    public class NotFoundException
+    public sealed class NotFoundException : Exception
     {
-        
+        public NotFoundException(string message)
+            : base(message) { }
     }
 }
