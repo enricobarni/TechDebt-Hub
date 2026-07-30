@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
 using TechDebtHub.Application.Features.Projetos.CriarProjeto;
+using TechDebtHub.Application.Features.Projetos.ListarProjetos;
 
 namespace TechDebtHub.Application
 {
@@ -14,6 +15,7 @@ namespace TechDebtHub.Application
         {
             services.AddScoped<CriarProjetoHandler>();
             services.AddScoped<BuscarPorIdHandler>();
+            services.AddScoped<ListarProjetosHandler>();
 
             return services;
         }
