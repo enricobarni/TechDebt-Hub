@@ -23,7 +23,10 @@ namespace TechDebtHub.Domain.Entities
             AlterarDescricao(descricao);
 
             Id = Guid.NewGuid();
+            Nome = nome.Trim();
+            Descricao = descricao.Trim();
             DataCriacao = DateTime.UtcNow;
+            DataAtualizacao = null;
             Arquivado = false;
         }
 
