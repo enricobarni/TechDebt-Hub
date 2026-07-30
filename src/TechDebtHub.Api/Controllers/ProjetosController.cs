@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
-using TechDebtHub.Application.Features.CriarProjeto;
+using TechDebtHub.Application.Features.Projetos.CriarProjeto;
 
 namespace TechDebtHub.Api.Controllers
 {
