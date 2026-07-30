@@ -23,6 +23,7 @@ namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
         {
             return await _context
                 .Projetos.AsNoTracking()
+                .Where(projeto => !projeto.Arquivado)
                 .OrderByDescending(projeto => projeto.DataAtualizacao ?? projeto.DataAtualizacao)
                 .Select(projeto => new ProjetoResumoResponse(
                     projeto.Id,
