@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
 using TechDebtHub.Application.Features.Projetos.CriarProjeto;
+using TechDebtHub.Application.Features.Projetos.ListarProjetos;
 
 namespace TechDebtHub.Api.Controllers
 {
@@ -16,13 +17,17 @@ namespace TechDebtHub.Api.Controllers
         private readonly CriarProjetoHandler _criarProjetoHandler;
         private readonly BuscarPorIdHandler _buscarPorIdHandler;
 
+        private readonly ListarProjetosHandler _listarProjetosHandler;
+
         public ProjetosController(
             CriarProjetoHandler criarProjetoHandler,
-            BuscarPorIdHandler buscarPorIdHandler
+            BuscarPorIdHandler buscarPorIdHandler,
+            ListarProjetosHandler listarProjetosHandler
         )
         {
             _criarProjetoHandler = criarProjetoHandler;
             _buscarPorIdHandler = buscarPorIdHandler;
+            _listarProjetosHandler = listarProjetosHandler;
         }
 
         [HttpPost]
@@ -35,7 +40,7 @@ namespace TechDebtHub.Api.Controllers
 
             var response = await _criarProjetoHandler.HandleAsync(command, cancellationToken);
 
-            return CreatedAtAction(nameof(BuscarPorId), new {id = response.Id}, response);
+            return CreatedAtAction(nameof(BuscarPorId), new { id = response.Id }, response);
         }
 
         [HttpGet("{id:guid}")]
@@ -47,6 +52,18 @@ namespace TechDebtHub.Api.Controllers
             var query = new BuscarPorIdQuery(id);
 
             var response = await _buscarPorIdHandler.HandlerAsync(query, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<ProjetoResumoResponse>>> Listar(
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new ListarProjetosQuery();
+
+            var response = await _listarProjetosHandler.HandlerAsync(query, cancellationToken);
 
             return Ok(response);
         }
