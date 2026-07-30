@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TechDebtHub.Api;
 using TechDebtHub.Application;
 using TechDebtHub.Infrastructure;
 using TechDebtHub.Infrastructure.Persistence;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddApi();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
