@@ -18,16 +18,22 @@ namespace TechDebtHub.Infrastructure.Persistence.Configuration
 
             builder.Property(divida => divida.Titulo).HasMaxLength(120).IsRequired();
 
+            builder.Property(divida => divida.TituloNormalizado).HasMaxLength(120).IsRequired();
+
+            builder
+                .HasIndex(divida => new { divida.ProjetoId, divida.TituloNormalizado })
+                .IsUnique();
+
             builder.Property(divida => divida.Descricao).HasMaxLength(2000).IsRequired();
 
             builder.Property(divida => divida.Categoria).IsRequired();
-            
+
             builder.Property(divida => divida.Status).IsRequired();
-            
+
             builder.Property(divida => divida.Impacto).IsRequired();
-            
+
             builder.Property(divida => divida.Urgencia).IsRequired();
-            
+
             builder.Property(divida => divida.Frequencia).IsRequired();
 
             builder.Property(divida => divida.Esforco).IsRequired();
