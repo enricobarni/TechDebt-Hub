@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
+using TechDebtHub.Application.Features.Projetos.ArquivarProjeto;
 using TechDebtHub.Application.Features.Projetos.AtualizarProjeto;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
 using TechDebtHub.Application.Features.Projetos.CriarProjeto;
@@ -19,18 +20,21 @@ namespace TechDebtHub.Api.Controllers
         private readonly BuscarPorIdHandler _buscarPorIdHandler;
         private readonly ListarProjetosHandler _listarProjetosHandler;
         private readonly AtualizarProjetoHandler _atualizarProjetoHandler;
+        private readonly ArquivarProjetoHandler _arquivarProjetoHandler;
 
         public ProjetosController(
             CriarProjetoHandler criarProjetoHandler,
             BuscarPorIdHandler buscarPorIdHandler,
             ListarProjetosHandler listarProjetosHandler,
-            AtualizarProjetoHandler atualizarProjetoHandler
+            AtualizarProjetoHandler atualizarProjetoHandler,
+            ArquivarProjetoHandler arquivarProjetoHandler
         )
         {
             _criarProjetoHandler = criarProjetoHandler;
             _buscarPorIdHandler = buscarPorIdHandler;
             _listarProjetosHandler = listarProjetosHandler;
             _atualizarProjetoHandler = atualizarProjetoHandler;
+            _arquivarProjetoHandler = arquivarProjetoHandler;
         }
 
         [HttpPost]
@@ -83,6 +87,16 @@ namespace TechDebtHub.Api.Controllers
             var response = await _atualizarProjetoHandler.HandleAsync(command, cancellationToken);
 
             return Ok(response);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Arquivar(Guid id, CancellationToken cancellationToken)
+        {
+            var command = new ArquivarProjetoCommand(id);
+
+            await _arquivarProjetoHandler.HandleAsync(command, cancellationToken);
+
+            return NoContent();
         }
     }
 }
