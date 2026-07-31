@@ -30,7 +30,7 @@ namespace TechDebtHub.Domain.Entities
             Arquivado = false;
         }
 
-        public void Atualizar(string nome, string descricao)
+        public void AtualizarProjeto(string nome, string descricao)
         {
             ValidarEAtribuirCampos(nome, descricao);
             DataAtualizacao = DateTime.UtcNow;
@@ -45,7 +45,7 @@ namespace TechDebtHub.Domain.Entities
             Descricao = descricao.Trim();
         }
 
-        private void ValidarNome(string nome)
+        private static void ValidarNome(string nome)
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
