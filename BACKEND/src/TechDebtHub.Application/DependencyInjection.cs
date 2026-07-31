@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 using TechDebtHub.Application.Features.Projetos.ArquivarProjeto;
 using TechDebtHub.Application.Features.Projetos.AtualizarProjeto;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
@@ -20,6 +21,7 @@ namespace TechDebtHub.Application
             services.AddScoped<ListarProjetosHandler>();
             services.AddScoped<AtualizarProjetoHandler>();
             services.AddScoped<ArquivarProjetoHandler>();
+            services.AddScoped<CriarDividaTecnicaHandler>();
 
             return services;
         }
