@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
 using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
+using TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas;
+using TechDebtHub.Domain.Enums;
 
 namespace TechDebtHub.Api.Controllers
 {
@@ -15,14 +17,17 @@ namespace TechDebtHub.Api.Controllers
     {
         private readonly CriarDividaTecnicaHandler _criarDividaTecnicaHandler;
         private readonly BuscarDividaTecnicaPorIdHandler _buscarDividaTecnicaPorIdHandler;
+        private readonly ListarDividasTecnicasHandler _listarDividasTecnicasHandler;
 
         public DividasTecnicasController(
             CriarDividaTecnicaHandler criarDividaTecnicaHandler,
-            BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler
+            BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler,
+            ListarDividasTecnicasHandler listarDividasTecnicasHandler
         )
         {
             _criarDividaTecnicaHandler = criarDividaTecnicaHandler;
             _buscarDividaTecnicaPorIdHandler = buscarDividaTecnicaPorIdHandler;
+            _listarDividasTecnicasHandler = listarDividasTecnicasHandler;
         }
 
         [HttpPost]
@@ -57,6 +62,25 @@ namespace TechDebtHub.Api.Controllers
             var query = new BuscarDividaTecnicaPorIdQuery(id);
 
             var response = await _buscarDividaTecnicaPorIdHandler.HandleAsync(
+                query,
+                cancellationToken
+            );
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<ListarDividasTecnicasResponse>>> Listar(
+            Guid projetoId,
+            [FromQuery] StatusDivida? status,
+            [FromQuery] CategoriaDivida? categoria,
+            [FromQuery] string? busca,
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new ListarDividasTecnicasQuery(projetoId, status, categoria, busca);
+
+            var response = await _listarDividasTecnicasHandler.HandleAsync(
                 query,
                 cancellationToken
             );
