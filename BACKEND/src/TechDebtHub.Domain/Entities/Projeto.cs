@@ -63,6 +63,11 @@ namespace TechDebtHub.Domain.Entities
 
         public void Arquivar()
         {
+            if (Arquivado)
+            {
+                throw new DomainException("Projeto já está arquivado");
+            }
+
             Arquivado = true;
             DataAtualizacao = DateTime.UtcNow;
         }
