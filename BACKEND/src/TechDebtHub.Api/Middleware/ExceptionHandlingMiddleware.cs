@@ -29,6 +29,15 @@ namespace TechDebtHub.Api.Middleware
             {
                 await _next(context);
             }
+            catch (ConflictException ex)
+            {
+                await HandleExceptionAsync(
+                    context,
+                    StatusCodes.Status409Conflict,
+                    title: "Conflito de dados",
+                    detail: ex.Message
+                );
+            }
             catch (NotFoundException ex)
             {
                 await HandleExceptionAsync(
