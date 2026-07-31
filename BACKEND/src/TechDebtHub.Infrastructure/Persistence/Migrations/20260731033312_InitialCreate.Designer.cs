@@ -12,7 +12,7 @@ using TechDebtHub.Infrastructure.Persistence;
 namespace TechDebtHub.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260729233015_InitialCreate")]
+    [Migration("20260731033312_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
