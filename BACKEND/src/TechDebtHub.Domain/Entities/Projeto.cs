@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TechDebtHub.Domain.Exceptions;
 
 namespace TechDebtHub.Domain.Entities
 {
@@ -19,8 +20,7 @@ namespace TechDebtHub.Domain.Entities
 
         public Projeto(string nome, string descricao)
         {
-            AlterarNome(nome);
-            AlterarDescricao(descricao);
+            ValidarEAtribuirCampos(nome, descricao);
 
             Id = Guid.NewGuid();
             Nome = nome.Trim();
@@ -30,29 +30,35 @@ namespace TechDebtHub.Domain.Entities
             Arquivado = false;
         }
 
-        public void AlterarNome(string nome)
+        public void Atualizar(string nome, string descricao)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new ArgumentException("O nome do projeto é obrigatório", nameof(nome));
-            }
-
-            Nome = nome.Trim();
+            ValidarEAtribuirCampos(nome, descricao);
             DataAtualizacao = DateTime.UtcNow;
         }
 
-        public void AlterarDescricao(string descricao)
+        private void ValidarEAtribuirCampos(string nome, string descricao)
+        {
+            ValidarNome(nome);
+            ValidarDescricao(descricao);
+
+            Nome = nome.Trim();
+            Descricao = descricao.Trim();
+        }
+
+        private static void ValidarNome(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                throw new DomainException("O nome do projeto é obrigatório");
+            }
+        }
+
+        private static void ValidarDescricao(string descricao)
         {
             if (string.IsNullOrWhiteSpace(descricao))
             {
-                throw new ArgumentException(
-                    "A descrição do projeto é obrigatória",
-                    nameof(descricao)
-                );
+                throw new DomainException("A descrição do projeto é obrigatória");
             }
-
-            Descricao = descricao.Trim();
-            DataAtualizacao = DateTime.UtcNow;
         }
 
         public void Arquivar()
