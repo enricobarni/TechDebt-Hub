@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
+using TechDebtHub.Application.Common.Models;
 
 namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
 {
@@ -16,15 +17,49 @@ namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
             _context = context;
         }
 
-        public async Task<IReadOnlyList<ProjetoResumoResponse>> HandlerAsync(
+        public async Task<PagedResult<ProjetoResumoResponse>> HandlerAsync(
             ListarProjetosQuery query,
             CancellationToken cancellationToken
         )
         {
-            return await _context
-                .Projetos.AsNoTracking()
-                .Where(projeto => !projeto.Arquivado)
-                .OrderByDescending(projeto => projeto.DataAtualizacao ?? projeto.DataAtualizacao)
+            int maximoPagina = 100;
+
+            if (query.Pagina < 1)
+            {
+                throw new ArgumentException("Apágina deve ser maior ou igual a 1");
+            }
+            if (query.TamanhoPagina < 1 || query.TamanhoPagina > maximoPagina)
+            {
+                throw new ArgumentException("O tamanho da página deve estar entre 1 e 100");
+            }
+
+            var consulta = _context.Projetos.AsNoTracking().AsQueryable();
+
+            if (query.Arquivado.HasValue)
+            {
+                consulta = consulta.Where(projeto => projeto.Arquivado == query.Arquivado.Value);
+            }
+            else
+            {
+                consulta = consulta.Where(projeto => !projeto.Arquivado);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Busca))
+            {
+                var busca = query.Busca.Trim();
+
+                consulta = consulta.Where(projeto => projeto.Nome.Contains(busca));
+            }
+
+            var totalItens = await consulta.CountAsync(cancellationToken);
+
+            var totalPaginas = (int)Math.Ceiling(totalItens / (double)query.TamanhoPagina);
+
+            var itens = await consulta
+                .OrderByDescending(projeto => projeto.DataAtualizacao ?? projeto.DataCriacao)
+                .ThenBy(projeto => projeto.Id)
+                .Skip((query.Pagina - 1) * query.TamanhoPagina)
+                .Take(query.TamanhoPagina)
                 .Select(projeto => new ProjetoResumoResponse(
                     projeto.Id,
                     projeto.Nome,
@@ -34,6 +69,14 @@ namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
                     projeto.Arquivado
                 ))
                 .ToListAsync(cancellationToken);
+
+            return new PagedResult<ProjetoResumoResponse>(
+                itens,
+                query.Pagina,
+                query.TamanhoPagina,
+                totalItens,
+                totalPaginas
+            );
         }
     }
 }
