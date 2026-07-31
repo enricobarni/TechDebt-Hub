@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
+using TechDebtHub.Application.Common.Models;
 using TechDebtHub.Application.Features.Projetos.ArquivarProjeto;
 using TechDebtHub.Application.Features.Projetos.AtualizarProjeto;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
@@ -64,11 +65,15 @@ namespace TechDebtHub.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ProjetoResumoResponse>>> Listar(
-            CancellationToken cancellationToken
+        public async Task<ActionResult<PagedResult<ProjetoResumoResponse>>> Listar(
+            CancellationToken cancellationToken,
+            [FromQuery] string? busca,
+            [FromQuery] bool? arquivado,
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamanhoPagina = 10
         )
         {
-            var query = new ListarProjetosQuery();
+            var query = new ListarProjetosQuery(busca, arquivado, pagina, tamanhoPagina);
 
             var response = await _listarProjetosHandler.HandlerAsync(query, cancellationToken);
 
