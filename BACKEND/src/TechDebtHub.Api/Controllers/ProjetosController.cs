@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.Projetos;
+using TechDebtHub.Application.Features.Projetos.AtualizarProjeto;
 using TechDebtHub.Application.Features.Projetos.BuscarPorId;
 using TechDebtHub.Application.Features.Projetos.CriarProjeto;
 using TechDebtHub.Application.Features.Projetos.ListarProjetos;
@@ -16,18 +17,20 @@ namespace TechDebtHub.Api.Controllers
     {
         private readonly CriarProjetoHandler _criarProjetoHandler;
         private readonly BuscarPorIdHandler _buscarPorIdHandler;
-
         private readonly ListarProjetosHandler _listarProjetosHandler;
+        private readonly AtualizarProjetoHandler _atualizarProjetoHandler;
 
         public ProjetosController(
             CriarProjetoHandler criarProjetoHandler,
             BuscarPorIdHandler buscarPorIdHandler,
-            ListarProjetosHandler listarProjetosHandler
+            ListarProjetosHandler listarProjetosHandler,
+            AtualizarProjetoHandler atualizarProjetoHandler
         )
         {
             _criarProjetoHandler = criarProjetoHandler;
             _buscarPorIdHandler = buscarPorIdHandler;
             _listarProjetosHandler = listarProjetosHandler;
+            _atualizarProjetoHandler = atualizarProjetoHandler;
         }
 
         [HttpPost]
@@ -64,6 +67,20 @@ namespace TechDebtHub.Api.Controllers
             var query = new ListarProjetosQuery();
 
             var response = await _listarProjetosHandler.HandlerAsync(query, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<AtualizarProjetoResponse>> Atualizar(
+            Guid id,
+            AtualizarProjetoRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new AtualizarProjetoCommand(id, request.Nome, request.Descricao);
+
+            var response = await _atualizarProjetoHandler.HandleAsync(command, cancellationToken);
 
             return Ok(response);
         }
