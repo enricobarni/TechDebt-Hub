@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Text;
 using TechDebtHub.Domain.Exceptions;
 
 namespace TechDebtHub.Domain.Entities
@@ -11,6 +9,7 @@ namespace TechDebtHub.Domain.Entities
     {
         public Guid Id { get; private set; }
         public string Nome { get; private set; } = string.Empty;
+        public string NomeNormalizado { get; private set; } = string.Empty;
         public string Descricao { get; private set; } = string.Empty;
         public DateTime DataCriacao { get; private set; }
         public DateTime? DataAtualizacao { get; private set; }
@@ -18,38 +17,120 @@ namespace TechDebtHub.Domain.Entities
 
         private Projeto() { }
 
-        public Projeto(string nome, string descricao)
+        private Projeto(string nome, string descricao)
         {
-            ValidarEAtribuirCampos(nome, descricao);
-
             Id = Guid.NewGuid();
-            Nome = nome.Trim();
-            Descricao = descricao.Trim();
             DataCriacao = DateTime.UtcNow;
             DataAtualizacao = null;
             Arquivado = false;
+
+            SetarCampos(nome, descricao);
+        }
+
+        public static Projeto Criar(string nome, string descricao)
+        {
+            return new Projeto(nome, descricao);
         }
 
         public void AtualizarProjeto(string nome, string descricao)
         {
-            ValidarEAtribuirCampos(nome, descricao);
+            GarantirQueNaoEstaArquivado();
+
+            SetarCampos(nome, descricao);
             DataAtualizacao = DateTime.UtcNow;
         }
 
-        private void ValidarEAtribuirCampos(string nome, string descricao)
+        public void Arquivar()
+        {
+            if (Arquivado)
+            {
+                throw new DomainException("O projeto já está arquivado.");
+            }
+
+            Arquivado = true;
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        private void SetarCampos(string nome, string descricao)
         {
             ValidarNome(nome);
             ValidarDescricao(descricao);
 
-            Nome = nome.Trim();
+            Nome = PrepararNomeParaExibicao(nome);
+            NomeNormalizado = NormalizarNome(nome);
             Descricao = descricao.Trim();
+        }
+
+        private void GarantirQueNaoEstaArquivado()
+        {
+            if (Arquivado)
+            {
+                throw new DomainException("Não é possível alterar um projeto arquivado.");
+            }
+        }
+
+        private static string PrepararNomeParaExibicao(string nome)
+        {
+            var partes = nome.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(' ', partes);
+        }
+
+        private static string NormalizarNome(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                throw new DomainException("O nome do projeto é obrigatório.");
+            }
+
+            var nomeDecomposto = nome.Trim().Normalize(NormalizationForm.FormKD);
+            var resultado = new StringBuilder(nomeDecomposto.Length);
+            var ultimoCaractereFoiEspaco = false;
+
+            foreach (var caractere in nomeDecomposto)
+            {
+                var categoria = CharUnicodeInfo.GetUnicodeCategory(caractere);
+
+                var ehMarcaDeAcentuacao =
+                    categoria
+                    is UnicodeCategory.NonSpacingMark
+                        or UnicodeCategory.SpacingCombiningMark
+                        or UnicodeCategory.EnclosingMark;
+
+                if (ehMarcaDeAcentuacao)
+                {
+                    continue;
+                }
+
+                if (char.IsWhiteSpace(caractere))
+                {
+                    if (resultado.Length > 0 && !ultimoCaractereFoiEspaco)
+                    {
+                        resultado.Append(' ');
+                        ultimoCaractereFoiEspaco = true;
+                    }
+
+                    continue;
+                }
+
+                resultado.Append(char.ToUpperInvariant(caractere));
+                ultimoCaractereFoiEspaco = false;
+            }
+
+            return resultado.ToString().Trim().Normalize(NormalizationForm.FormC);
         }
 
         private static void ValidarNome(string nome)
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
-                throw new DomainException("O nome do projeto é obrigatório");
+                throw new DomainException("O nome do projeto é obrigatório.");
+            }
+
+            if (nome.Trim().Length > 100)
+            {
+                throw new DomainException(
+                    "O nome do projeto deve possuir no máximo 100 caracteres."
+                );
             }
         }
 
@@ -57,19 +138,15 @@ namespace TechDebtHub.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(descricao))
             {
-                throw new DomainException("A descrição do projeto é obrigatória");
+                throw new DomainException("A descrição do projeto é obrigatória.");
             }
-        }
 
-        public void Arquivar()
-        {
-            if (Arquivado)
+            if (descricao.Trim().Length > 1000)
             {
-                throw new DomainException("Projeto já está arquivado");
+                throw new DomainException(
+                    "A descrição do projeto deve possuir no máximo 1000 caracteres."
+                );
             }
-
-            Arquivado = true;
-            DataAtualizacao = DateTime.UtcNow;
         }
     }
 }
