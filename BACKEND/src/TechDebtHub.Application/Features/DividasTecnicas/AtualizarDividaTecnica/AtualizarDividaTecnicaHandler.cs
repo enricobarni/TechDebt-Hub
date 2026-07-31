@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Exceptions;
+using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Exceptions;
 
 namespace TechDebtHub.Application.Features.DividasTecnicas.AtualizarDividaTecnica
@@ -31,6 +32,25 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.AtualizarDividaTecnic
             if (divida is null)
             {
                 throw new NotFoundException("Dívida técnica não encontrada");
+            }
+
+            var tituloNormalizado = TextNormalizer.NormalizarParaComparacao(command.Titulo);
+
+            var tituloPertenceAOutraDivida = await _context
+                .DividasTecnicas.AsNoTracking()
+                .AnyAsync(
+                    outraDivida =>
+                        outraDivida.Id != command.Id
+                        && outraDivida.ProjetoId == divida.ProjetoId
+                        && outraDivida.TituloNormalizado == tituloNormalizado,
+                    cancellationToken
+                );
+
+            if (tituloPertenceAOutraDivida)
+            {
+                throw new ConflictException(
+                    "Já existe outra dívida com esse título neste projeto."
+                );
             }
 
             divida.AtualizarDividaTecnica(

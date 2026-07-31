@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Exceptions;
+using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Entities;
 using TechDebtHub.Domain.Exceptions;
 
@@ -37,7 +38,25 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica
 
             if (projeto.Arquivado)
             {
-                throw new DomainException("Não é possível criar uma dívida em um projeto arquivado.");
+                throw new DomainException(
+                    "Não é possível criar uma dívida em um projeto arquivado."
+                );
+            }
+
+            var tituloNormalizado = TextNormalizer.NormalizarParaComparacao(command.Titulo);
+
+            var tituloJaExiste = await _context
+                .DividasTecnicas.AsNoTracking()
+                .AnyAsync(
+                    divida =>
+                        divida.ProjetoId == command.ProjetoId
+                        && divida.TituloNormalizado == tituloNormalizado,
+                    cancellationToken
+                );
+
+            if (tituloJaExiste)
+            {
+                throw new ConflictException("Já existe uma dívida com esse título neste projeto.");
             }
 
             var divida = DividaTecnica.Criar(
