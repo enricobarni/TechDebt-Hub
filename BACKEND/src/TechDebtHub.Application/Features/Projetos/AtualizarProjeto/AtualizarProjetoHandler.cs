@@ -32,6 +32,22 @@ namespace TechDebtHub.Application.Features.Projetos.AtualizarProjeto
                 throw new NotFoundException("Projeto Não Encontrado");
             }
 
+            var nomeNormalizado = command.Nome.Trim().ToUpperInvariant();
+
+            var nomePertenceAOutroProjeto = await _context
+                .Projetos.AsNoTracking()
+                .AnyAsync(
+                    outroProjeto =>
+                        outroProjeto.Id != command.Id
+                        && outroProjeto.NomeNormalizado == nomeNormalizado,
+                    cancellationToken
+                );
+
+            if (nomePertenceAOutroProjeto)
+            {
+                throw new ConflictException("Já existe um projeto com esse nome");
+            }
+
             projeto.AtualizarProjeto(command.Nome, command.Descricao);
 
             await _context.SaveChangesAsync(cancellationToken);
