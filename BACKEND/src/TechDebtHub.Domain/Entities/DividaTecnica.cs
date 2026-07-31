@@ -10,6 +10,7 @@ namespace TechDebtHub.Domain.Entities
     public class DividaTecnica
     {
         public Guid Id { get; private set; }
+        public Guid ProjetoId { get; private set; }
         public string Titulo { get; private set; } = string.Empty;
         public string Descricao { get; private set; } = string.Empty;
         public CategoriaDivida Categoria { get; private set; }
@@ -19,7 +20,6 @@ namespace TechDebtHub.Domain.Entities
         public NivelFrequencia Frequencia { get; private set; }
         public NivelEsforco Esforco { get; private set; }
         public decimal PontuacaoPrioridade { get; private set; }
-        public Guid ProjetoId { get; private set; }
         public DateTime DataCriacao { get; private set; }
         public DateTime? DataAtualizacao { get; private set; }
         public DateTime? DataResolucao { get; private set; }
