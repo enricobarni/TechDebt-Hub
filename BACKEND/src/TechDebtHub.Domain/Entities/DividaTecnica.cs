@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TechDebtHub.Domain.Enums;
 using TechDebtHub.Domain.Exceptions;
+using TechDebtHub.Domain.Common;
 
 namespace TechDebtHub.Domain.Entities
 {
@@ -12,6 +13,7 @@ namespace TechDebtHub.Domain.Entities
         public Guid Id { get; private set; }
         public Guid ProjetoId { get; private set; }
         public string Titulo { get; private set; } = string.Empty;
+        public string TituloNormalizado { get; private set; } = string.Empty;
         public string Descricao { get; private set; } = string.Empty;
         public CategoriaDivida Categoria { get; private set; }
         public StatusDivida Status { get; private set; }
@@ -109,7 +111,8 @@ namespace TechDebtHub.Domain.Entities
             ValidarEnum(frequencia, nameof(frequencia));
             ValidarEnum(esforco, nameof(esforco));
 
-            Titulo = titulo.Trim();
+            Titulo = TextNormalizer.PrepararParaExibicao(titulo);
+            TituloNormalizado = TextNormalizer.NormalizarParaComparacao(titulo);
             Descricao = descricao.Trim();
             Categoria = categoria;
             Impacto = impacto;
