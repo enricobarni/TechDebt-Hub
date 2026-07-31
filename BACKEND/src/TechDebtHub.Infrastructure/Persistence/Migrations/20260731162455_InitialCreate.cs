@@ -32,6 +32,7 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProjetoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Titulo = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     Categoria = table.Column<int>(type: "int", nullable: false),
@@ -41,7 +42,6 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                     Frequencia = table.Column<int>(type: "int", nullable: false),
                     Esforco = table.Column<int>(type: "int", nullable: false),
                     PontuacaoPrioridade = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    ProjetoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DataResolucao = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -50,12 +50,17 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_DividasTecnicas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DividasTecnicas_Projetos_Id",
-                        column: x => x.Id,
+                        name: "FK_DividasTecnicas_Projetos_ProjetoId",
+                        column: x => x.ProjetoId,
                         principalTable: "Projetos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DividasTecnicas_ProjetoId",
+                table: "DividasTecnicas",
+                column: "ProjetoId");
         }
 
         /// <inheritdoc />
