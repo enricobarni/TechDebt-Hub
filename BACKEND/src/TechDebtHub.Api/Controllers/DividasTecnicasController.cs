@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
+using TechDebtHub.Application.Common.Models;
 using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas;
@@ -70,15 +71,24 @@ namespace TechDebtHub.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ListarDividasTecnicasResponse>>> Listar(
+        public async Task<ActionResult<PagedResult<ListarDividasTecnicasResponse>>> Listar(
             Guid projetoId,
+            CancellationToken cancellationToken,
             [FromQuery] StatusDivida? status,
             [FromQuery] CategoriaDivida? categoria,
             [FromQuery] string? busca,
-            CancellationToken cancellationToken
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamanhoPagina = 10
         )
         {
-            var query = new ListarDividasTecnicasQuery(projetoId, status, categoria, busca);
+            var query = new ListarDividasTecnicasQuery(
+                projetoId,
+                status,
+                categoria,
+                busca,
+                pagina,
+                tamanhoPagina
+            );
 
             var response = await _listarDividasTecnicasHandler.HandleAsync(
                 query,
