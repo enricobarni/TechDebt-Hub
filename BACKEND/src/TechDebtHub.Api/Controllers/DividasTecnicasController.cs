@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
 using TechDebtHub.Application.Common.Models;
+using TechDebtHub.Application.Features.DividasTecnicas.AtualizarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas;
@@ -19,16 +20,19 @@ namespace TechDebtHub.Api.Controllers
         private readonly CriarDividaTecnicaHandler _criarDividaTecnicaHandler;
         private readonly BuscarDividaTecnicaPorIdHandler _buscarDividaTecnicaPorIdHandler;
         private readonly ListarDividasTecnicasHandler _listarDividasTecnicasHandler;
+        private readonly AtualizarDividaTecnicaHandler _atualizarDividaTecnicaHandler;
 
         public DividasTecnicasController(
             CriarDividaTecnicaHandler criarDividaTecnicaHandler,
             BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler,
-            ListarDividasTecnicasHandler listarDividasTecnicasHandler
+            ListarDividasTecnicasHandler listarDividasTecnicasHandler,
+            AtualizarDividaTecnicaHandler atualizarDividaTecnicaHandler
         )
         {
             _criarDividaTecnicaHandler = criarDividaTecnicaHandler;
             _buscarDividaTecnicaPorIdHandler = buscarDividaTecnicaPorIdHandler;
             _listarDividasTecnicasHandler = listarDividasTecnicasHandler;
+            _atualizarDividaTecnicaHandler = atualizarDividaTecnicaHandler;
         }
 
         [HttpPost]
@@ -92,6 +96,32 @@ namespace TechDebtHub.Api.Controllers
 
             var response = await _listarDividasTecnicasHandler.HandleAsync(
                 query,
+                cancellationToken
+            );
+
+            return Ok(response);
+        }
+
+        [HttpPut("/dividas/{id:guid}")]
+        public async Task<ActionResult<AtualizarDividaTecnicaResponse>> Atualizar(
+            Guid id,
+            AtualizarDividaTecnicaRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new AtualizarDividaTecnicaCommand(
+                id,
+                request.Titulo,
+                request.Descricao,
+                request.Categoria,
+                request.Impacto,
+                request.Urgencia,
+                request.Frequencia,
+                request.Esforco
+            );
+
+            var response = await _atualizarDividaTecnicaHandler.HandleAsync(
+                command,
                 cancellationToken
             );
 
