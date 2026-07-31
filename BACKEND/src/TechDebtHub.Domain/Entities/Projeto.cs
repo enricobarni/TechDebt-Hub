@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using TechDebtHub.Domain.Exceptions;
+using TechDebtHub.Domain.Common;
 
 namespace TechDebtHub.Domain.Entities
 {
@@ -56,8 +57,8 @@ namespace TechDebtHub.Domain.Entities
             ValidarNome(nome);
             ValidarDescricao(descricao);
 
-            Nome = PrepararNomeParaExibicao(nome);
-            NomeNormalizado = NormalizarNome(nome);
+            Nome = TextNormalizer.PrepararParaExibicao(nome);
+            NomeNormalizado = TextNormalizer.NormalizarParaComparacao(nome);
             Descricao = descricao.Trim();
         }
 
@@ -67,56 +68,6 @@ namespace TechDebtHub.Domain.Entities
             {
                 throw new DomainException("Não é possível alterar um projeto arquivado.");
             }
-        }
-
-        private static string PrepararNomeParaExibicao(string nome)
-        {
-            var partes = nome.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-            return string.Join(' ', partes);
-        }
-
-        private static string NormalizarNome(string nome)
-        {
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new DomainException("O nome do projeto é obrigatório.");
-            }
-
-            var nomeDecomposto = nome.Trim().Normalize(NormalizationForm.FormKD);
-            var resultado = new StringBuilder(nomeDecomposto.Length);
-            var ultimoCaractereFoiEspaco = false;
-
-            foreach (var caractere in nomeDecomposto)
-            {
-                var categoria = CharUnicodeInfo.GetUnicodeCategory(caractere);
-
-                var ehMarcaDeAcentuacao =
-                    categoria
-                    is UnicodeCategory.NonSpacingMark
-                        or UnicodeCategory.SpacingCombiningMark
-                        or UnicodeCategory.EnclosingMark;
-
-                if (ehMarcaDeAcentuacao)
-                {
-                    continue;
-                }
-
-                if (char.IsWhiteSpace(caractere))
-                {
-                    if (resultado.Length > 0 && !ultimoCaractereFoiEspaco)
-                    {
-                        resultado.Append(' ');
-                        ultimoCaractereFoiEspaco = true;
-                    }
-
-                    continue;
-                }
-
-                resultado.Append(char.ToUpperInvariant(caractere));
-                ultimoCaractereFoiEspaco = false;
-            }
-
-            return resultado.ToString().Trim().Normalize(NormalizationForm.FormC);
         }
 
         private static void ValidarNome(string nome)
