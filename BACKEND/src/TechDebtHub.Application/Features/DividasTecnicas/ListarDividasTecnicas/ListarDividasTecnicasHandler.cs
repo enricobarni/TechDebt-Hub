@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
+using TechDebtHub.Application.Common.Models;
 using TechDebtHub.Application.Exceptions;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 using TechDebtHub.Domain.Entities;
@@ -19,11 +20,21 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
             _context = context;
         }
 
-        public async Task<IReadOnlyList<ListarDividasTecnicasResponse>> HandleAsync(
+        public async Task<PagedResult<ListarDividasTecnicasResponse>> HandleAsync(
             ListarDividasTecnicasQuery query,
             CancellationToken cancellationToken
         )
         {
+            int maximoPaginas = 100;
+
+            if (query.Pagina < 1)
+            {
+                throw new ArgumentException("A página deve ser maior ou igual a 1");
+            }
+            if (query.TamanhoPagina < 1 || query.TamanhoPagina > maximoPaginas)
+            {
+                throw new ArgumentException("O tamanho da página deve estar entre 1 e 100");
+            }
             if (query.Status.HasValue && !Enum.IsDefined(query.Status.Value))
             {
                 throw new ArgumentException("O status é inválido");
@@ -61,10 +72,16 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
                 consulta = consulta.Where(divida => divida.Titulo.Contains(busca));
             }
 
-            return await consulta
+            var totalItens = await consulta.CountAsync(cancellationToken);
+
+            var totalPaginas = (int)Math.Ceiling(totalItens / (double)query.TamanhoPagina);
+
+            var itens = await consulta
                 .OrderByDescending(divida => divida.PontuacaoPrioridade)
                 .ThenByDescending(divida => divida.DataCriacao)
                 .ThenBy(divida => divida.Id)
+                .Skip((query.Pagina - 1) * query.TamanhoPagina)
+                .Take(query.TamanhoPagina)
                 .Select(divida => new ListarDividasTecnicasResponse(
                     divida.Id,
                     divida.Titulo,
@@ -79,6 +96,14 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
                     divida.DataAtualizacao
                 ))
                 .ToListAsync(cancellationToken);
+
+            return new PagedResult<ListarDividasTecnicasResponse>(
+                itens,
+                query.Pagina,
+                query.TamanhoPagina,
+                totalItens,
+                totalPaginas
+            );
         }
     }
 }
