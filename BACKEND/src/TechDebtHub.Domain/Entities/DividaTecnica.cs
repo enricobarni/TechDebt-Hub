@@ -37,18 +37,14 @@ namespace TechDebtHub.Domain.Entities
             NivelEsforco esforco
         )
         {
+            ValidarProjeto(projetoId);
+
             Id = Guid.NewGuid();
             ProjetoId = projetoId;
-            Titulo = titulo;
-            Descricao = descricao;
-            Categoria = categoria;
-            Impacto = impacto;
-            Urgencia = urgencia;
-            Frequencia = frequencia;
-            Esforco = esforco;
             Status = StatusDivida.Aberta;
-            PontuacaoPrioridade = CalcularPrioridade();
             DataCriacao = DateTime.UtcNow;
+
+            SetarCampos(titulo, descricao, categoria, impacto, urgencia, frequencia, esforco);
         }
 
         public static DividaTecnica Criar(
@@ -62,19 +58,10 @@ namespace TechDebtHub.Domain.Entities
             NivelEsforco esforco
         )
         {
-            ValidarProjeto(projetoId);
-            ValidarTitulo(titulo);
-            ValidarDescricao(descricao);
-            ValidarEnum(categoria, nameof(categoria));
-            ValidarEnum(impacto, nameof(impacto));
-            ValidarEnum(urgencia, nameof(urgencia));
-            ValidarEnum(frequencia, nameof(frequencia));
-            ValidarEnum(esforco, nameof(esforco));
-
             return new DividaTecnica(
                 projetoId,
-                titulo.Trim(),
-                descricao.Trim(),
+                titulo,
+                descricao,
                 categoria,
                 impacto,
                 urgencia,
@@ -83,19 +70,54 @@ namespace TechDebtHub.Domain.Entities
             );
         }
 
-        public void AtualizarDividaTecnica(string titulo, string descricao)
+        public void AtualizarDividaTecnica(
+            string titulo,
+            string descricao,
+            CategoriaDivida categoria,
+            NivelImpacto impacto,
+            NivelUrgencia urgencia,
+            NivelFrequencia frequencia,
+            NivelEsforco esforco
+        )
         {
-            ValidarEAtribuirCampos(titulo, descricao);
+            if (Status == StatusDivida.Resolvida || Status == StatusDivida.Arquivada)
+            {
+                throw new DomainException(
+                    $"Não é possível alterar uma dívida técnica com o status '{Status}'"
+                );
+            }
+
+            SetarCampos(titulo, descricao, categoria, impacto, urgencia, frequencia, esforco);
             DataAtualizacao = DateTime.UtcNow;
         }
 
-        private void ValidarEAtribuirCampos(string titulo, string descricao)
+        private void SetarCampos(
+            string titulo,
+            string descricao,
+            CategoriaDivida categoria,
+            NivelImpacto impacto,
+            NivelUrgencia urgencia,
+            NivelFrequencia frequencia,
+            NivelEsforco esforco
+        )
         {
             ValidarTitulo(titulo);
             ValidarDescricao(descricao);
+            ValidarEnum(categoria, nameof(categoria));
+            ValidarEnum(impacto, nameof(impacto));
+            ValidarEnum(urgencia, nameof(urgencia));
+            ValidarEnum(frequencia, nameof(frequencia));
+            ValidarEnum(esforco, nameof(esforco));
 
             Titulo = titulo.Trim();
             Descricao = descricao.Trim();
+            Categoria = categoria;
+            Impacto = impacto;
+            Urgencia = urgencia;
+            Frequencia = frequencia;
+            Esforco = esforco;
+
+            PontuacaoPrioridade = CalcularPrioridade();
         }
 
         private static void ValidarProjeto(Guid projetoId)
@@ -141,8 +163,14 @@ namespace TechDebtHub.Domain.Entities
 
         private decimal CalcularPrioridade()
         {
-            return PontuacaoPrioridade =
-                (decimal)Impacto * (decimal)Urgencia * (decimal)Frequencia / (decimal)Esforco;
+            var valorEsforco = (decimal)Esforco;
+
+            if (valorEsforco == 0)
+            {
+                throw new DomainException("O nível de esforço não pode ser zero");
+            }
+
+            return (decimal)Impacto * (decimal)Urgencia * (decimal)Frequencia / (decimal)Esforco;
         }
     }
 }
