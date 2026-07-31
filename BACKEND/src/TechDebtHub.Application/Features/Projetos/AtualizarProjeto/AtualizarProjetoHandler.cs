@@ -32,7 +32,7 @@ namespace TechDebtHub.Application.Features.Projetos.AtualizarProjeto
                 throw new NotFoundException("Projeto Não Encontrado");
             }
 
-            projeto.Atualizar(command.Nome, command.Descricao);
+            projeto.AtualizarProjeto(command.Nome, command.Descricao);
 
             await _context.SaveChangesAsync(cancellationToken);
 
