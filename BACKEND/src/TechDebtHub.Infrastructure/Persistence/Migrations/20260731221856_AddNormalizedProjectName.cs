@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TechDebtHub.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddNormalizedProjectName : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,7 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    NomeNormalizado = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -61,6 +62,12 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                 name: "IX_DividasTecnicas_ProjetoId",
                 table: "DividasTecnicas",
                 column: "ProjetoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projetos_NomeNormalizado",
+                table: "Projetos",
+                column: "NomeNormalizado",
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -18,6 +18,10 @@ namespace TechDebtHub.Infrastructure.Persistence.Configuration
 
             builder.Property(projeto => projeto.Nome).HasMaxLength(120).IsRequired();
 
+            builder.Property(projeto => projeto.NomeNormalizado).HasMaxLength(120).IsRequired();
+
+            builder.HasIndex(projeto => projeto.NomeNormalizado).IsUnique();
+
             builder.Property(projeto => projeto.Descricao).HasMaxLength(1000).IsRequired();
 
             builder.Property(projeto => projeto.Arquivado).IsRequired();

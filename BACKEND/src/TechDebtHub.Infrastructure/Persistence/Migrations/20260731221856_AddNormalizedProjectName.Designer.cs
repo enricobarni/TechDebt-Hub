@@ -12,8 +12,8 @@ using TechDebtHub.Infrastructure.Persistence;
 namespace TechDebtHub.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260731162455_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260731221856_AddNormalizedProjectName")]
+    partial class AddNormalizedProjectName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,7 +107,15 @@ namespace TechDebtHub.Infrastructure.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<string>("NomeNormalizado")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("NomeNormalizado")
+                        .IsUnique();
 
                     b.ToTable("Projetos", (string)null);
                 });
