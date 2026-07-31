@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
+using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 
 namespace TechDebtHub.Api.Controllers
@@ -13,10 +14,15 @@ namespace TechDebtHub.Api.Controllers
     public class DividasTecnicasController : ControllerBase
     {
         private readonly CriarDividaTecnicaHandler _criarDividaTecnicaHandler;
+        private readonly BuscarDividaTecnicaPorIdHandler _buscarDividaTecnicaPorIdHandler;
 
-        public DividasTecnicasController(CriarDividaTecnicaHandler criarDividaTecnicaHandler)
+        public DividasTecnicasController(
+            CriarDividaTecnicaHandler criarDividaTecnicaHandler,
+            BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler
+        )
         {
             _criarDividaTecnicaHandler = criarDividaTecnicaHandler;
+            _buscarDividaTecnicaPorIdHandler = buscarDividaTecnicaPorIdHandler;
         }
 
         [HttpPost]
@@ -39,7 +45,23 @@ namespace TechDebtHub.Api.Controllers
 
             var response = await _criarDividaTecnicaHandler.HandleAsync(command, cancellationToken);
 
-            return StatusCode(StatusCodes.Status201Created, response);
+            return CreatedAtAction(nameof(BuscarPorId), new { id = response.Id }, response);
+        }
+
+        [HttpGet("/dividas/{id:guid}")]
+        public async Task<ActionResult<BuscarDividaTecnicaPorIdResponse>> BuscarPorId(
+            Guid id,
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new BuscarDividaTecnicaPorIdQuery(id);
+
+            var response = await _buscarDividaTecnicaPorIdHandler.HandleAsync(
+                query,
+                cancellationToken
+            );
+
+            return Ok(response);
         }
     }
 }
