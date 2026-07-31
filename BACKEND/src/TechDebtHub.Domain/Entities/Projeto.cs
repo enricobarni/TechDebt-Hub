@@ -45,7 +45,7 @@ namespace TechDebtHub.Domain.Entities
             Descricao = descricao.Trim();
         }
 
-        private static void ValidarNome(string nome)
+        private void ValidarNome(string nome)
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
