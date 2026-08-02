@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
 using TechDebtHub.Application.Common.Models;
+using TechDebtHub.Application.Features.DividasTecnicas.AlterarStatusDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.AtualizarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
@@ -21,18 +22,21 @@ namespace TechDebtHub.Api.Controllers
         private readonly BuscarDividaTecnicaPorIdHandler _buscarDividaTecnicaPorIdHandler;
         private readonly ListarDividasTecnicasHandler _listarDividasTecnicasHandler;
         private readonly AtualizarDividaTecnicaHandler _atualizarDividaTecnicaHandler;
+        private readonly AlterarStatusDividaTecnicaHandler _alterarStatusDividaTecnicaHandler;
 
         public DividasTecnicasController(
             CriarDividaTecnicaHandler criarDividaTecnicaHandler,
             BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler,
             ListarDividasTecnicasHandler listarDividasTecnicasHandler,
-            AtualizarDividaTecnicaHandler atualizarDividaTecnicaHandler
+            AtualizarDividaTecnicaHandler atualizarDividaTecnicaHandler,
+            AlterarStatusDividaTecnicaHandler alterarStatusDividaTecnicaHandler
         )
         {
             _criarDividaTecnicaHandler = criarDividaTecnicaHandler;
             _buscarDividaTecnicaPorIdHandler = buscarDividaTecnicaPorIdHandler;
             _listarDividasTecnicasHandler = listarDividasTecnicasHandler;
             _atualizarDividaTecnicaHandler = atualizarDividaTecnicaHandler;
+            _alterarStatusDividaTecnicaHandler = alterarStatusDividaTecnicaHandler;
         }
 
         [HttpPost]
@@ -126,6 +130,23 @@ namespace TechDebtHub.Api.Controllers
             );
 
             return Ok(response);
+        }
+
+        [HttpPatch("/dividas/{id:guid}/status")]
+        public async Task<ActionResult<AlterarStatusDividaTecnicaResponse>> AlterarStatus(
+            Guid id,
+            AlterarStatusDividaTecnicaRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new AlterarStatusDividaTecnicaCommand(id, request.NovoStatus);
+
+            var responde = await _alterarStatusDividaTecnicaHandler.HandleAsync(
+                command,
+                cancellationToken
+            );
+
+            return Ok(responde);
         }
     }
 }
