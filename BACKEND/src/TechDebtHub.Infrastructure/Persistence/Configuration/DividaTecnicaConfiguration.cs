@@ -30,6 +30,8 @@ namespace TechDebtHub.Infrastructure.Persistence.Configuration
 
             builder.Property(divida => divida.Status).IsRequired();
 
+            builder.Property(divida => divida.Arquivada).IsRequired().HasDefaultValue(false);
+
             builder.Property(divida => divida.Impacto).IsRequired();
 
             builder.Property(divida => divida.Urgencia).IsRequired();
