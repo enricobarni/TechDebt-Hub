@@ -30,6 +30,7 @@ namespace TechDebtHub.Application
             services.AddScoped<ListarDividasTecnicasHandler>();
             services.AddScoped<AtualizarDividaTecnicaHandler>();
             services.AddScoped<AlterarStatusDividaTecnicaHandler>();
+            services.AddScoped<ArquivarProjetoHandler>();
 
             return services;
         }

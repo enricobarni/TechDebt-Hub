@@ -55,7 +55,10 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
 
             var consulta = _context
                 .DividasTecnicas.AsNoTracking()
-                .Where(divida => divida.ProjetoId == query.ProjetoId);
+                .Where(divida =>
+                    divida.ProjetoId == query.ProjetoId
+                    && divida.Status != Domain.Enums.StatusDivida.Arquivada
+                );
 
             if (query.Status.HasValue)
             {
