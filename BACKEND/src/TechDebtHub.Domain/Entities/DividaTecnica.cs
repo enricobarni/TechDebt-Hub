@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Enums;
 using TechDebtHub.Domain.Exceptions;
-using TechDebtHub.Domain.Common;
 
 namespace TechDebtHub.Domain.Entities
 {
@@ -174,6 +174,72 @@ namespace TechDebtHub.Domain.Entities
             }
 
             return (decimal)Impacto * (decimal)Urgencia * (decimal)Frequencia / (decimal)Esforco;
+        }
+
+        public void AlterarStatus(StatusDivida novoStatus)
+        {
+            ValidarEnum(novoStatus, nameof(novoStatus));
+
+            if (Status == novoStatus)
+            {
+                throw new DomainException("A dívida técnica já está nesse status");
+            }
+
+            if (!TransicaoPermitida(Status, novoStatus))
+            {
+                throw new DomainException(
+                    $"Não é permitido alterar o status de {Status} para {novoStatus}"
+                );
+            }
+
+            if (novoStatus == StatusDivida.Resolvida)
+            {
+                Resolver();
+                return;
+            }
+
+            Status = novoStatus;
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        private static bool TransicaoPermitida(StatusDivida statusAtual, StatusDivida novoStatus)
+        {
+            return statusAtual switch
+            {
+                StatusDivida.Aberta => novoStatus
+                    is StatusDivida.EmAnalise
+                        or StatusDivida.Aceita
+                        or StatusDivida.Arquivada,
+
+                StatusDivida.EmAnalise => novoStatus
+                    is StatusDivida.Planejada
+                        or StatusDivida.Aceita
+                        or StatusDivida.Arquivada,
+
+                StatusDivida.Planejada => novoStatus
+                    is StatusDivida.EmAndamento
+                        or StatusDivida.Aceita
+                        or StatusDivida.Arquivada,
+
+                StatusDivida.EmAndamento => novoStatus
+                    is StatusDivida.Resolvida
+                        or StatusDivida.Arquivada,
+
+                StatusDivida.Resolvida => false,
+
+                StatusDivida.Aceita => novoStatus == StatusDivida.Arquivada,
+
+                StatusDivida.Arquivada => false,
+
+                _ => false,
+            };
+        }
+
+        private void Resolver()
+        {
+            Status = StatusDivida.Resolvida;
+            DataResolucao = DateTime.UtcNow;
+            DataAtualizacao = DateTime.UtcNow;
         }
     }
 }
