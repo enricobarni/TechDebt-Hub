@@ -87,6 +87,7 @@ namespace TechDebtHub.Api.Controllers
             Guid projetoId,
             CancellationToken cancellationToken,
             [FromQuery] StatusDivida? status,
+            [FromQuery] bool? arquivada,
             [FromQuery] CategoriaDivida? categoria,
             [FromQuery] string? busca,
             [FromQuery] int pagina = 1,
@@ -97,6 +98,7 @@ namespace TechDebtHub.Api.Controllers
                 projetoId,
                 status,
                 categoria,
+                arquivada,
                 busca,
                 pagina,
                 tamanhoPagina
