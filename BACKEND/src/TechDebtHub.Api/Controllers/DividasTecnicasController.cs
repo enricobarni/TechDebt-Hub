@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechDebtHub.Api.Contracts.DividasTecnicas;
 using TechDebtHub.Application.Common.Models;
 using TechDebtHub.Application.Features.DividasTecnicas.AlterarStatusDividaTecnica;
+using TechDebtHub.Application.Features.DividasTecnicas.ArquivarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.AtualizarDividaTecnica;
 using TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPorId;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
@@ -23,13 +24,15 @@ namespace TechDebtHub.Api.Controllers
         private readonly ListarDividasTecnicasHandler _listarDividasTecnicasHandler;
         private readonly AtualizarDividaTecnicaHandler _atualizarDividaTecnicaHandler;
         private readonly AlterarStatusDividaTecnicaHandler _alterarStatusDividaTecnicaHandler;
+        private readonly ArquivarDividaTecnicaHandler _arquivarDividaTecnicaHandler;
 
         public DividasTecnicasController(
             CriarDividaTecnicaHandler criarDividaTecnicaHandler,
             BuscarDividaTecnicaPorIdHandler buscarDividaTecnicaPorIdHandler,
             ListarDividasTecnicasHandler listarDividasTecnicasHandler,
             AtualizarDividaTecnicaHandler atualizarDividaTecnicaHandler,
-            AlterarStatusDividaTecnicaHandler alterarStatusDividaTecnicaHandler
+            AlterarStatusDividaTecnicaHandler alterarStatusDividaTecnicaHandler,
+            ArquivarDividaTecnicaHandler arquivarDividaTecnicaHandler
         )
         {
             _criarDividaTecnicaHandler = criarDividaTecnicaHandler;
@@ -37,6 +40,7 @@ namespace TechDebtHub.Api.Controllers
             _listarDividasTecnicasHandler = listarDividasTecnicasHandler;
             _atualizarDividaTecnicaHandler = atualizarDividaTecnicaHandler;
             _alterarStatusDividaTecnicaHandler = alterarStatusDividaTecnicaHandler;
+            _arquivarDividaTecnicaHandler = arquivarDividaTecnicaHandler;
         }
 
         [HttpPost]
@@ -147,6 +151,16 @@ namespace TechDebtHub.Api.Controllers
             );
 
             return Ok(responde);
+        }
+
+        [HttpDelete("/dividas{id:guid}")]
+        public async Task<IActionResult> Arquivar(Guid id, CancellationToken cancellationToken)
+        {
+            var command = new ArquivarDividaTecnicaCommand(id);
+
+            await _arquivarDividaTecnicaHandler.HandleAsync(command, cancellationToken);
+
+            return NoContent();
         }
     }
 }
