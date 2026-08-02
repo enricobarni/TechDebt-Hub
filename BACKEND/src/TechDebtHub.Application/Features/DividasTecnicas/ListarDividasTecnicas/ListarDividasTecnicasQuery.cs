@@ -6,6 +6,7 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
         Guid ProjetoId,
         StatusDivida? Status,
         CategoriaDivida? Categoria,
+        bool? Arquivada,
         string? Busca,
         int Pagina,
         int TamanhoPagina

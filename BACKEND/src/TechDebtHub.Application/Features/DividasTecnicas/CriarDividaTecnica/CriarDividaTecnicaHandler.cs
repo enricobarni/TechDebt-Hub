@@ -80,6 +80,8 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica
                 divida.Titulo,
                 divida.Descricao,
                 divida.Categoria,
+                divida.Status,
+                divida.Arquivada,
                 divida.Impacto,
                 divida.Urgencia,
                 divida.Frequencia,

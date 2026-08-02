@@ -8,6 +8,8 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica
         string Titulo,
         string Descricao,
         CategoriaDivida Categoria,
+        StatusDivida Status,
+        bool Arquivada,
         NivelImpacto Impacto,
         NivelUrgencia Urgencia,
         NivelFrequencia Frequencia, 

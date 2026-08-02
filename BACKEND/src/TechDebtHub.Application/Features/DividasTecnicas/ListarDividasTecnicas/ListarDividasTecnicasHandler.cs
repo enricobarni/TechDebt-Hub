@@ -7,6 +7,7 @@ using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Common.Models;
 using TechDebtHub.Application.Exceptions;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
+using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Entities;
 
 namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
@@ -55,22 +56,26 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
 
             var consulta = _context
                 .DividasTecnicas.AsNoTracking()
-                .Where(divida =>
-                    divida.ProjetoId == query.ProjetoId
-                    && divida.Status != Domain.Enums.StatusDivida.Arquivada
-                );
+                .Where(divida => divida.ProjetoId == query.ProjetoId);
+
+            if (query.Arquivada.HasValue)
+            {
+                consulta = consulta.Where(divida => divida.Arquivada == query.Arquivada.Value);
+            }
 
             if (query.Status.HasValue)
             {
                 consulta = consulta.Where(divida => divida.Status == query.Status.Value);
             }
+
             if (query.Categoria.HasValue)
             {
                 consulta = consulta.Where(divida => divida.Categoria == query.Categoria.Value);
             }
+
             if (!string.IsNullOrWhiteSpace(query.Busca))
             {
-                var busca = query.Busca.Trim();
+                var busca = TextNormalizer.NormalizarParaComparacao(query.Busca);
 
                 consulta = consulta.Where(divida => divida.Titulo.Contains(busca));
             }
@@ -90,6 +95,7 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
                     divida.Titulo,
                     divida.Categoria,
                     divida.Status,
+                    divida.Arquivada,
                     divida.Impacto,
                     divida.Urgencia,
                     divida.Frequencia,

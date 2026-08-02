@@ -33,6 +33,7 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPo
                     divida.Descricao,
                     divida.Categoria,
                     divida.Status,
+                    divida.Arquivada,
                     divida.Impacto,
                     divida.Urgencia,
                     divida.Frequencia,

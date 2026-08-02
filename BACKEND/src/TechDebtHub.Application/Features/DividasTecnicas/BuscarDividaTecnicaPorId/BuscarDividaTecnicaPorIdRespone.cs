@@ -9,6 +9,7 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.BuscarDividaTecnicaPo
         string Descricao,
         CategoriaDivida Categoria,
         StatusDivida Status,
+        bool Arquivada,
         NivelImpacto Impacto,
         NivelUrgencia Urgencia,
         NivelFrequencia Frequencia,
