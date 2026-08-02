@@ -17,6 +17,7 @@ namespace TechDebtHub.Domain.Entities
         public string Descricao { get; private set; } = string.Empty;
         public CategoriaDivida Categoria { get; private set; }
         public StatusDivida Status { get; private set; }
+        public bool Arquivada { get; private set; }
         public NivelImpacto Impacto { get; private set; }
         public NivelUrgencia Urgencia { get; private set; }
         public NivelFrequencia Frequencia { get; private set; }
@@ -44,6 +45,7 @@ namespace TechDebtHub.Domain.Entities
             Id = Guid.NewGuid();
             ProjetoId = projetoId;
             Status = StatusDivida.Aberta;
+            Arquivada = false;
             DataCriacao = DateTime.UtcNow;
 
             SetarCampos(titulo, descricao, categoria, impacto, urgencia, frequencia, esforco);
@@ -82,11 +84,11 @@ namespace TechDebtHub.Domain.Entities
             NivelEsforco esforco
         )
         {
-            if (Status == StatusDivida.Resolvida || Status == StatusDivida.Arquivada)
+            ValidarNaoArquivada();
+
+            if (Status == StatusDivida.Resolvida)
             {
-                throw new DomainException(
-                    $"Não é possível alterar uma dívida técnica com o status '{Status}'"
-                );
+                throw new DomainException("Não é possível alterar uma dívida técnica já resolvida");
             }
 
             SetarCampos(titulo, descricao, categoria, impacto, urgencia, frequencia, esforco);
@@ -222,8 +224,6 @@ namespace TechDebtHub.Domain.Entities
 
                 StatusDivida.Aceita => false,
 
-                StatusDivida.Arquivada => false,
-
                 _ => false,
             };
         }
@@ -237,13 +237,23 @@ namespace TechDebtHub.Domain.Entities
 
         public void Arquivar()
         {
-            if (Status == StatusDivida.Arquivada)
+            ValidarNaoArquivada();
+
+            if (Status == StatusDivida.Resolvida)
+            {
+                throw new DomainException("Não é possível arquivar uma dívida técnica resolvida");
+            }
+
+            Arquivada = true;
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        private void ValidarNaoArquivada()
+        {
+            if (Arquivada)
             {
                 throw new DomainException("A dívida técnica já está arquivada");
             }
-
-            Status = StatusDivida.Arquivada;
-            DataAtualizacao = DateTime.UtcNow;
         }
     }
 }

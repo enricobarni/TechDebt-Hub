@@ -8,6 +8,5 @@ namespace TechDebtHub.Domain.Enums
         EmAndamento = 4,
         Resolvida = 5,
         Aceita = 6,
-        Arquivada = 7
     }
 }
