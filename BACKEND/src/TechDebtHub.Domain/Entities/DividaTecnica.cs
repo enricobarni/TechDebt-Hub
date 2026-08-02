@@ -206,28 +206,21 @@ namespace TechDebtHub.Domain.Entities
         {
             return statusAtual switch
             {
-                StatusDivida.Aberta => novoStatus
-                    is StatusDivida.EmAnalise
-                        or StatusDivida.Aceita
-                        or StatusDivida.Arquivada,
+                StatusDivida.Aberta => novoStatus is StatusDivida.EmAnalise or StatusDivida.Aceita,
 
                 StatusDivida.EmAnalise => novoStatus
                     is StatusDivida.Planejada
-                        or StatusDivida.Aceita
-                        or StatusDivida.Arquivada,
+                        or StatusDivida.Aceita,
 
                 StatusDivida.Planejada => novoStatus
                     is StatusDivida.EmAndamento
-                        or StatusDivida.Aceita
-                        or StatusDivida.Arquivada,
+                        or StatusDivida.Aceita,
 
-                StatusDivida.EmAndamento => novoStatus
-                    is StatusDivida.Resolvida
-                        or StatusDivida.Arquivada,
+                StatusDivida.EmAndamento => novoStatus == StatusDivida.Resolvida,
 
                 StatusDivida.Resolvida => false,
 
-                StatusDivida.Aceita => novoStatus == StatusDivida.Arquivada,
+                StatusDivida.Aceita => false,
 
                 StatusDivida.Arquivada => false,
 
@@ -239,6 +232,17 @@ namespace TechDebtHub.Domain.Entities
         {
             Status = StatusDivida.Resolvida;
             DataResolucao = DateTime.UtcNow;
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        public void Arquivar()
+        {
+            if (Status == StatusDivida.Arquivada)
+            {
+                throw new DomainException("A dívida técnica já está arquivada");
+            }
+
+            Status = StatusDivida.Arquivada;
             DataAtualizacao = DateTime.UtcNow;
         }
     }
