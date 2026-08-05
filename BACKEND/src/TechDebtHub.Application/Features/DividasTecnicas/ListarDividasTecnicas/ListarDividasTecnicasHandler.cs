@@ -9,6 +9,7 @@ using TechDebtHub.Application.Exceptions;
 using TechDebtHub.Application.Features.DividasTecnicas.CriarDividaTecnica;
 using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Entities;
+using TechDebtHub.Domain.Enums;
 
 namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
 {
@@ -62,10 +63,18 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
             {
                 consulta = consulta.Where(divida => divida.Arquivada == query.Arquivada.Value);
             }
+            else
+            {
+                consulta = consulta.Where(divida => !divida.Arquivada);
+            }
 
             if (query.Status.HasValue)
             {
                 consulta = consulta.Where(divida => divida.Status == query.Status.Value);
+            }
+            else
+            {
+                consulta = consulta.Where(divida => divida.Status != StatusDivida.Resolvida);
             }
 
             if (query.Categoria.HasValue)
