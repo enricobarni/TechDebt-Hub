@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Exceptions;
+using TechDebtHub.Domain.Enums;
+using TechDebtHub.Domain.Exceptions;
 
 namespace TechDebtHub.Application.Features.DividasTecnicas.ArquivarDividaTecnica
 {
@@ -30,6 +32,23 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ArquivarDividaTecnica
             if (divida is null)
             {
                 throw new NotFoundException("Dívida técnica não encontrada");
+            }
+
+            var possuiDividasAtivas = await _context
+                .DividasTecnicas.AsNoTracking()
+                .AnyAsync(
+                    divida =>
+                        divida.ProjetoId == command.Id
+                        && !divida.Arquivada
+                        && divida.Status != StatusDivida.Resolvida,
+                    cancellationToken
+                );
+
+            if (possuiDividasAtivas)
+            {
+                throw new DomainException(
+                    "Não é possível arquivar um projeto que possui dívidas técnicas ativas"
+                );
             }
 
             divida.Arquivar();

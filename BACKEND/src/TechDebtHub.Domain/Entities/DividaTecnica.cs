@@ -180,6 +180,7 @@ namespace TechDebtHub.Domain.Entities
 
         public void AlterarStatus(StatusDivida novoStatus)
         {
+            ValidarNaoArquivada();
             ValidarEnum(novoStatus, nameof(novoStatus));
 
             if (Status == novoStatus)
@@ -194,14 +195,14 @@ namespace TechDebtHub.Domain.Entities
                 );
             }
 
+            Status = novoStatus;
+            DataAtualizacao = DateTime.UtcNow;
+
             if (novoStatus == StatusDivida.Resolvida)
             {
                 Resolver();
                 return;
             }
-
-            Status = novoStatus;
-            DataAtualizacao = DateTime.UtcNow;
         }
 
         private static bool TransicaoPermitida(StatusDivida statusAtual, StatusDivida novoStatus)
