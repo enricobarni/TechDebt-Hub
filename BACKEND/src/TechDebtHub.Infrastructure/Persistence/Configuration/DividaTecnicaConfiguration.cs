@@ -42,6 +42,13 @@ namespace TechDebtHub.Infrastructure.Persistence.Configuration
 
             builder.Property(divida => divida.PontuacaoPrioridade).HasPrecision(10, 2).IsRequired();
 
+            builder.HasIndex(divida => new
+            {
+                divida.ProjetoId,
+                divida.Arquivada,
+                divida.Status,
+            });
+
             builder
                 .HasOne<Projeto>()
                 .WithMany()
