@@ -23,5 +23,6 @@
     <ProjectReference Include="..\..\src\TechDebtHub.Application\TechDebtHub.Application.csproj" />
     <ProjectReference Include="..\..\src\TechDebtHub.Domain\TechDebtHub.Domain.csproj" />
     <ProjectReference Include="..\..\src\TechDebtHub.Infrastructure\TechDebtHub.Infrastructure.csproj" />
+    <ProjectReference Include="..\TechDebtHub.Application.Tests\TechDebtHub.Application.Tests.csproj" />
   </ItemGroup>
 </Project>
