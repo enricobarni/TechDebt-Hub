@@ -104,5 +104,106 @@ namespace TechDebtHub.Domain.Tests.Entities
             var exception = Assert.Throws<DomainException>(segundaTentativaArquivar);
             Assert.Equal("O projeto já está arquivado", exception.Message);
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Criar_NomeVazio_DeveLancarExcecao(string? nomeInvalido)
+        {
+            // Given
+            var descricao = "Descrição válida.";
+
+            // When
+            Action acaoInvalida = () => Projeto.Criar(nomeInvalido!, descricao);
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal("O nome do projeto é obrigatório", exception.Message);
+        }
+
+        [Fact]
+        public void Criar_NomeMaiorQueLimitePermitido_DeveLancarExcecao()
+        {
+            // Given
+            var nomeInvalido = new string('A', 101);
+            var descricao = "Descrição válida.";
+
+            // When
+            Action acaoInvalida = () => Projeto.Criar(nomeInvalido, descricao);
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal("O nome do projeto deve possuir no máximo 100 caracteres", exception.Message);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Criar_DescricaoVazia_DeveLancarExcecao(string? descricaoInvalida)
+        {
+            // Given
+            var nome = "TechDebt Hub";
+
+            // When
+            Action acaoInvalida = () => Projeto.Criar(nome, descricaoInvalida!);
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal("A descrição do projeto é obrigatória", exception.Message);
+        }
+
+        [Fact]
+        public void Criar_DescricaoMaiorQueLimitePermitido_DeveLancarExcecao()
+        {
+            // Given
+            var nome = "TechDebt Hub";
+            var descricaoInvalida = new string('A', 1001);
+
+            // When
+            Action acaoInvalida = () => Projeto.Criar(nome, descricaoInvalida);
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal(
+                "A descrição do projeto deve possuir no máximo 1000 caracteres",
+                exception.Message
+            );
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Atualizar_NomeInvalido_DeveLancarExcecao(string? nomeInvalido)
+        {
+            // Given
+            var projeto = Projeto.Criar("TechDebt Hub", "Descrição válida.");
+
+            // When
+            Action acaoInvalida = () => projeto.AtualizarProjeto(nomeInvalido!, "Outra descrição.");
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal("O nome do projeto é obrigatório", exception.Message);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Atualizar_DescricaoInvalida_DeveLancarExcecao(string? descricaoInvalida)
+        {
+            // Given
+            var projeto = Projeto.Criar("TechDebt Hub", "Descrição válida.");
+
+            // When
+            Action acaoInvalida = () => projeto.AtualizarProjeto("Outro nome", descricaoInvalida!);
+
+            // Then
+            var exception = Assert.Throws<DomainException>(acaoInvalida);
+            Assert.Equal("A descrição do projeto é obrigatória", exception.Message);
+        }
     }
 }
