@@ -59,7 +59,7 @@ namespace TechDebtHub.Api.Controllers
         {
             var query = new BuscarPorIdQuery(id);
 
-            var response = await _buscarPorIdHandler.HandlerAsync(query, cancellationToken);
+            var response = await _buscarPorIdHandler.HandleAsync(query, cancellationToken);
 
             return Ok(response);
         }
@@ -75,7 +75,7 @@ namespace TechDebtHub.Api.Controllers
         {
             var query = new ListarProjetosQuery(busca, arquivado, pagina, tamanhoPagina);
 
-            var response = await _listarProjetosHandler.HandlerAsync(query, cancellationToken);
+            var response = await _listarProjetosHandler.HandleAsync(query, cancellationToken);
 
             return Ok(response);
         }

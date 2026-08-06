@@ -17,7 +17,7 @@ namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
             _context = context;
         }
 
-        public async Task<PagedResult<ProjetoResumoResponse>> HandlerAsync(
+        public async Task<PagedResult<ProjetoResumoResponse>> HandleAsync(
             ListarProjetosQuery query,
             CancellationToken cancellationToken
         )

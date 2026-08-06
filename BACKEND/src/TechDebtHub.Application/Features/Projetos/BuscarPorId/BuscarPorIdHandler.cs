@@ -17,7 +17,7 @@ namespace TechDebtHub.Application.Features.Projetos.BuscarPorId
             _context = context;
         }
 
-        public async Task<BuscarPorIdResponse> HandlerAsync(
+        public async Task<BuscarPorIdResponse> HandleAsync(
             BuscarPorIdQuery query,
             CancellationToken cancellationToken
         )
