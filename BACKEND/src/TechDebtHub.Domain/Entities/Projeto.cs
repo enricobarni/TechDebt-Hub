@@ -45,7 +45,7 @@ namespace TechDebtHub.Domain.Entities
         {
             if (Arquivado)
             {
-                throw new DomainException("O projeto já está arquivado.");
+                throw new DomainException("O projeto já está arquivado");
             }
 
             Arquivado = true;
@@ -66,7 +66,7 @@ namespace TechDebtHub.Domain.Entities
         {
             if (Arquivado)
             {
-                throw new DomainException("Não é possível alterar um projeto arquivado.");
+                throw new DomainException("Não é possível alterar um projeto arquivado");
             }
         }
 
@@ -74,13 +74,13 @@ namespace TechDebtHub.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
-                throw new DomainException("O nome do projeto é obrigatório.");
+                throw new DomainException("O nome do projeto é obrigatório");
             }
 
             if (nome.Trim().Length > 100)
             {
                 throw new DomainException(
-                    "O nome do projeto deve possuir no máximo 100 caracteres."
+                    "O nome do projeto deve possuir no máximo 100 caracteres"
                 );
             }
         }
@@ -89,13 +89,13 @@ namespace TechDebtHub.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(descricao))
             {
-                throw new DomainException("A descrição do projeto é obrigatória.");
+                throw new DomainException("A descrição do projeto é obrigatória");
             }
 
             if (descricao.Trim().Length > 1000)
             {
                 throw new DomainException(
-                    "A descrição do projeto deve possuir no máximo 1000 caracteres."
+                    "A descrição do projeto deve possuir no máximo 1000 caracteres"
                 );
             }
         }
