@@ -174,6 +174,9 @@ public sealed class DividaTecnicaTests
     [InlineData(StatusDivida.EmAnalise, StatusDivida.Planejada)]
     [InlineData(StatusDivida.Planejada, StatusDivida.EmAndamento)]
     [InlineData(StatusDivida.EmAndamento, StatusDivida.Resolvida)]
+    [InlineData(StatusDivida.Aberta, StatusDivida.Aceita)]
+    [InlineData(StatusDivida.EmAnalise, StatusDivida.Aceita)]
+    [InlineData(StatusDivida.Planejada, StatusDivida.Aceita)]
     public void AlterarStatus_TransicaoPermitida_DeveAlterarStatus(
         StatusDivida statusAtual,
         StatusDivida novoStatus
@@ -192,6 +195,7 @@ public sealed class DividaTecnicaTests
     [InlineData(StatusDivida.Aberta, StatusDivida.EmAndamento)]
     [InlineData(StatusDivida.EmAnalise, StatusDivida.Resolvida)]
     [InlineData(StatusDivida.Planejada, StatusDivida.Resolvida)]
+    [InlineData(StatusDivida.EmAndamento, StatusDivida.EmAnalise)]
     public void AlterarStatus_TransicaoInvalida_DeveLancarExcecao(
         StatusDivida statusAtual,
         StatusDivida novoStatus
@@ -200,6 +204,198 @@ public sealed class DividaTecnicaTests
         var divida = CriarDividaNoStatus(statusAtual);
 
         Assert.Throws<DomainException>(() => divida.AlterarStatus(novoStatus));
+    }
+
+    [Fact]
+    public void AlterarStatus_DividaArquivada_DeveLancarExcecao()
+    {
+        // Given - Dívida criada e arquivada
+        var divida = DividaTecnicaFactory.Criar();
+        divida.Arquivar();
+
+        // When - Tentativa de alterar status de entidade arquivada
+        Action acaoInvalida = () => divida.AlterarStatus(StatusDivida.EmAnalise);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("A dívida técnica já está arquivada", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(StatusDivida.Aberta)]
+    [InlineData(StatusDivida.EmAnalise)]
+    [InlineData(StatusDivida.Planejada)]
+    [InlineData(StatusDivida.EmAndamento)]
+    [InlineData(StatusDivida.Resolvida)]
+    public void AlterarStatus_APartirDeAceita_DeveLancarExcecao(StatusDivida novoStatus)
+    {
+        // Given - Dívida no estado terminal Aceita
+        var divida = CriarDividaAceita();
+
+        // When - Tentativa de mudar para qualquer outro status
+        Action acaoInvalida = () => divida.AlterarStatus(novoStatus);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal(
+            $"Não é permitido alterar o status de {StatusDivida.Aceita} para {novoStatus}",
+            exception.Message
+        );
+    }
+
+    [Fact]
+    public void AlterarStatus_NovoStatusForaDoEnum_DeveLancarExcecao()
+    {
+        // Given
+        var divida = DividaTecnicaFactory.Criar();
+        var statusInvalido = (StatusDivida)999;
+
+        // When
+        Action acaoInvalida = () => divida.AlterarStatus(statusInvalido);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para novoStatus é inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_ProjetoIdVazio_DeveLancarExcecao()
+    {
+        // Given
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(projetoId: Guid.Empty);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O projeto é obrigatório", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Criar_TituloVazio_DeveLancarExcecao(string? tituloInvalido)
+    {
+        // Given
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(titulo: tituloInvalido!);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O título da dívida técnica é obrigatório", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_TituloMaiorQueLimitePermitido_DeveLancarExcecao()
+    {
+        // Given
+        var tituloInvalido = new string('A', 121);
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(titulo: tituloInvalido);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O título deve possuir no máximo 120 caracteres.", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Criar_DescricaoVazia_DeveLancarExcecao(string? descricaoInvalida)
+    {
+        // Given
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(descricao: descricaoInvalida!);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("A descrição da Dívida Técnica é obrigatória", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_DescricaoMaiorQueLimitePermitido_DeveLancarExcecao()
+    {
+        // Given
+        var descricaoInvalida = new string('A', 2001);
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(descricao: descricaoInvalida);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("A descrição deve possuir no máximo 2000 caracteres.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_CategoriaInvalida_DeveLancarExcecao()
+    {
+        // Given
+        var categoriaInvalida = (CategoriaDivida)999;
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(categoria: categoriaInvalida);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para categoria é inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_ImpactoInvalido_DeveLancarExcecao()
+    {
+        // Given
+        var impactoInvalido = (NivelImpacto)999;
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(impacto: impactoInvalido);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para impacto é inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_UrgenciaInvalida_DeveLancarExcecao()
+    {
+        // Given
+        var urgenciaInvalida = (NivelUrgencia)999;
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(urgencia: urgenciaInvalida);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para urgencia é inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_FrequenciaInvalida_DeveLancarExcecao()
+    {
+        // Given
+        var frequenciaInvalida = (NivelFrequencia)999;
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(frequencia: frequenciaInvalida);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para frequencia é inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void Criar_EsforcoInvalido_DeveLancarExcecao()
+    {
+        // Given
+        var esforcoInvalido = (NivelEsforco)999;
+
+        // When
+        Action acaoInvalida = () => DividaTecnicaFactory.Criar(esforco: esforcoInvalido);
+
+        // Then
+        var exception = Assert.Throws<DomainException>(acaoInvalida);
+        Assert.Equal("O valor informado para esforco é inválido.", exception.Message);
     }
 
     // Helper privado para montagem de cenários de teste complexos
@@ -211,6 +407,15 @@ public sealed class DividaTecnicaTests
         divida.AlterarStatus(StatusDivida.Planejada);
         divida.AlterarStatus(StatusDivida.EmAndamento);
         divida.AlterarStatus(StatusDivida.Resolvida);
+
+        return divida;
+    }
+
+    private static DividaTecnica CriarDividaAceita()
+    {
+        var divida = DividaTecnicaFactory.Criar();
+
+        divida.AlterarStatus(StatusDivida.Aceita);
 
         return divida;
     }
