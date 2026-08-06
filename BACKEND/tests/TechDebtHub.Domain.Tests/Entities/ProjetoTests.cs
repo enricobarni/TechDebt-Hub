@@ -12,14 +12,14 @@ namespace TechDebtHub.Domain.Tests.Entities
         [Fact]
         public void Criar_ComDadosValidos_DeveCriarProjetoAtivo()
         {
-            // Given (Dado que) - Preparação das entradas
+            // Given
             var nome = "TechDebt Hub";
             var descricao = "Sistema para controle de dívidas técnicas.";
 
-            // When (Quando) - Execução do comportamento testado
+            // When
             var projeto = Projeto.Criar(nome, descricao);
 
-            // Then (Então) - Validação das asserções
+            // Then
             Assert.NotEqual(Guid.Empty, projeto.Id);
             Assert.Equal("TechDebt Hub", projeto.Nome);
             Assert.Equal("TECHDEBT HUB", projeto.NomeNormalizado);
@@ -46,7 +46,7 @@ namespace TechDebtHub.Domain.Tests.Entities
         [Fact]
         public void Atualizar_ComDadosValidos_DeveAlterarProjeto()
         {
-            // Given - Criação do estado inicial do projeto
+            // Given
             var projeto = Projeto.Criar("Nome inicial", "Descrição inicial.");
             var novoNome = "Nome atualizado";
             var novaDescricao = "Descrição atualizada.";
@@ -54,7 +54,7 @@ namespace TechDebtHub.Domain.Tests.Entities
             // When - Execução da atualização
             projeto.AtualizarProjeto(novoNome, novaDescricao);
 
-            // Then - Validação das alterações efetuadas
+            // Then
             Assert.Equal("Nome atualizado", projeto.Nome);
             Assert.Equal("NOME ATUALIZADO", projeto.NomeNormalizado);
             Assert.Equal("Descrição atualizada.", projeto.Descricao);
@@ -64,16 +64,16 @@ namespace TechDebtHub.Domain.Tests.Entities
         [Fact]
         public void Atualizar_ProjetoArquivado_DeveLancarExcecao()
         {
-            // Given - Projeto é criado e em seguida arquivado
+            // Given
             var projeto = Projeto.Criar("TechDebt Hub", "Descrição válida.");
             projeto.Arquivar();
 
-            // When - Ação que deve falhar isolada em uma expressão
+            // When
             Action acaoInvalida = () => projeto.AtualizarProjeto("Outro nome", "Outra descrição.");
 
-            // Then - Validação da exceção e da mensagem de erro
+            // Then
             var exception = Assert.Throws<DomainException>(acaoInvalida);
-            Assert.Equal("Não é possível alterar um projeto arquivado.", exception.Message);
+            Assert.Equal("Não é possível alterar um projeto arquivado", exception.Message);
         }
 
         [Fact]
@@ -93,16 +93,16 @@ namespace TechDebtHub.Domain.Tests.Entities
         [Fact]
         public void Arquivar_ProjetoJaArquivado_DeveLancarExcecao()
         {
-            // Given - Projeto já inicia arquivado
+            // Given
             var projeto = Projeto.Criar("TechDebt Hub", "Descrição válida.");
             projeto.Arquivar();
 
-            // When - Segunda tentativa de arquivar
+            // When
             Action segundaTentativaArquivar = () => projeto.Arquivar();
 
             // Then
             var exception = Assert.Throws<DomainException>(segundaTentativaArquivar);
-            Assert.Equal("O projeto já está arquivado.", exception.Message);
+            Assert.Equal("O projeto já está arquivado", exception.Message);
         }
     }
 }
