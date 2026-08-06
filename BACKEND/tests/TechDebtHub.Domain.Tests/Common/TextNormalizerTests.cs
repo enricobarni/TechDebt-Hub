@@ -51,5 +51,14 @@ namespace TechDebtHub.Domain.Tests.Common
         {
             Assert.Throws<ArgumentException>(() => TextNormalizer.NormalizarParaComparacao(valor!));
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void PrepararParaExibicao_ValorVazio_DeveLancarExcecao(string? valor)
+        {
+            Assert.Throws<ArgumentException>(() => TextNormalizer.PrepararParaExibicao(valor!));
+        }
     }
 }
