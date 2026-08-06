@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Exceptions;
+using TechDebtHub.Domain.Common;
 
 namespace TechDebtHub.Application.Features.Projetos.AtualizarProjeto
 {
@@ -32,7 +33,7 @@ namespace TechDebtHub.Application.Features.Projetos.AtualizarProjeto
                 throw new NotFoundException("Projeto Não Encontrado");
             }
 
-            var nomeNormalizado = command.Nome.Trim().ToUpperInvariant();
+            var nomeNormalizado = TextNormalizer.NormalizarParaComparacao(command.Nome);
 
             var nomePertenceAOutroProjeto = await _context
                 .Projetos.AsNoTracking()
