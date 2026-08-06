@@ -6,6 +6,7 @@
     <Project Path="src/TechDebtHub.Infrastructure/TechDebtHub.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/TechDebtHub.Application.Tests/TechDebtHub.Application.Tests.csproj" />
     <Project Path="tests/TechDebtHub.Domain.Tests/TechDebtHub.Domain.Tests.csproj" />
   </Folder>
 </Solution>
