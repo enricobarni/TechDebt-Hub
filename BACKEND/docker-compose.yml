@@ -1,0 +1,25 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: techdebthub-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SQL_SA_PASSWORD}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - techdebthub_sqldata:/var/opt/mssql
+
+  api:
+    build: .
+    container_name: techdebthub-api
+    depends_on:
+      - sqlserver
+    environment:
+      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=TechDebtHub;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - "5005:8080"
+
+volumes:
+  techdebthub_sqldata:
