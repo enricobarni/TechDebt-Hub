@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TechDebtHub.Application.Abstractions.Persistence;
+using TechDebtHub.Application.Interfaces;
 using TechDebtHub.Infrastructure.Persistence;
+using TechDebtHub.Infrastructure.Security;
 
 namespace TechDebtHub.Infrastructure
 {
@@ -33,6 +35,8 @@ namespace TechDebtHub.Infrastructure
             services.AddScoped<IApplicationDbContext>(serviceProvider =>
                 serviceProvider.GetRequiredService<ApplicationDbContext>()
             );
+
+            services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
 
             return services;
         }
