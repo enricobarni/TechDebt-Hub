@@ -155,7 +155,7 @@ namespace TechDebtHub.Api.Controllers
             return Ok(responde);
         }
 
-        [HttpDelete("/dividas{id:guid}")]
+        [HttpDelete("/dividas/{id:guid}")]
         public async Task<IActionResult> Arquivar(Guid id, CancellationToken cancellationToken)
         {
             var command = new ArquivarDividaTecnicaCommand(id);
