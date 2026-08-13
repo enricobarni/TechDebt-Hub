@@ -86,7 +86,7 @@ namespace TechDebtHub.Application.Features.DividasTecnicas.ListarDividasTecnicas
             {
                 var busca = TextNormalizer.NormalizarParaComparacao(query.Busca);
 
-                consulta = consulta.Where(divida => divida.Titulo.Contains(busca));
+                consulta = consulta.Where(divida => divida.TituloNormalizado.Contains(busca));
             }
 
             var totalItens = await consulta.CountAsync(cancellationToken);

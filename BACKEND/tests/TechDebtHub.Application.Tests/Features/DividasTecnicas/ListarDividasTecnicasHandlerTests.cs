@@ -262,11 +262,11 @@ public sealed class ListarDividasTecnicasHandlerTests : ApplicationTestBase
 
         var dividaCorrespondente = DividaTecnicaFactory.Criar(
             projeto.Id,
-            titulo: "PERFORMANCE CRITICA"
+            titulo: "Performance Crítica"
         );
         var dividaNaoCorrespondente = DividaTecnicaFactory.Criar(
             projeto.Id,
-            titulo: "SEGURANCA DO SISTEMA"
+            titulo: "Segurança do Sistema"
         );
 
         Context.DividasTecnicas.AddRange(dividaCorrespondente, dividaNaoCorrespondente);

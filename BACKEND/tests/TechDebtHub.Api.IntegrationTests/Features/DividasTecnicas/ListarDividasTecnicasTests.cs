@@ -226,21 +226,14 @@ public sealed class ListarDividasTecnicasTests : ApiIntegrationTestBase
     }
 
     [Fact]
-    public async Task Get_DividasTecnicas_ComFiltroBusca_ETituloEmMaiusculas_DeveRetornarApenasDividasCorrespondentes()
+    public async Task Get_DividasTecnicas_ComFiltroBusca_DeveSerCaseInsensitiveEIgnorarAcentos()
     {
-        // Given - bug conhecido e documentado abaixo: o handler normaliza o termo de busca para
-        // maiúsculas sem acentos (TextNormalizer.NormalizarParaComparacao) mas compara esse termo
-        // contra "divida.Titulo" (que preserva a caixa original digitada pelo usuário, apenas com
-        // espaços colapsados via PrepararParaExibicao), e não contra "divida.TituloNormalizado"
-        // (que é o campo já normalizado para comparação). Como o provedor Sqlite do EF Core
-        // traduz string.Contains para "instr()", que é case-sensitive, a busca só encontra
-        // resultados quando o trecho do título já estiver em maiúsculas — não é assim que um
-        // usuário digitaria um título normalmente. Ver também o teste
-        // "..._ComTituloEmCaixaNatural_NaoEncontraApesarDoTituloConterOTermo" abaixo, que
-        // demonstra o caso comum (título em caixa natural) não encontrando o resultado esperado.
+        // Given - termo buscado em minúsculas e sem acento; título salvo em caixa natural, com
+        // acento. Antes do fix (comparação contra Titulo em vez de TituloNormalizado), essa
+        // combinação não retornava nenhum resultado.
         var projeto = ProjetoFactory.Criar();
 
-        var dividaConsulta = DividaTecnicaFactory.Criar(projeto.Id, "PAGINACAO ausente na consulta");
+        var dividaConsulta = DividaTecnicaFactory.Criar(projeto.Id, "Consulta sem paginação");
         var dividaDeploy = DividaTecnicaFactory.Criar(projeto.Id, "Deploy manual sem pipeline");
 
         await UsingContextAsync(async context =>
@@ -256,9 +249,8 @@ public sealed class ListarDividasTecnicasTests : ApiIntegrationTestBase
         // Then
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var corpo = await response.Content.ReadFromJsonAsync<
-            PagedResult<ListarDividasTecnicasResponse>
-        >();
+        var corpo =
+            await response.Content.ReadFromJsonAsync.PagedResult<ListarDividasTecnicasResponse>();
 
         Assert.NotNull(corpo);
         Assert.Single(corpo!.Itens);
@@ -266,16 +258,12 @@ public sealed class ListarDividasTecnicasTests : ApiIntegrationTestBase
     }
 
     [Fact]
-    public async Task Get_DividasTecnicas_ComFiltroBusca_ComTituloEmCaixaNatural_NaoEncontraApesarDoTituloConterOTermo()
+    public async Task Get_DividasTecnicas_ComFiltroBusca_SemCorrespondencia_DeveRetornarListaVazia()
     {
-        // Given - documenta o mesmo bug de case-sensitivity descrito no teste acima: um título
-        // digitado do jeito que um usuário normalmente digitaria (caixa natural, não toda em
-        // maiúsculas) NÃO é encontrado pela busca mesmo contendo literalmente o termo buscado,
-        // porque o termo de busca é normalizado para maiúsculas mas o título não é. Este teste
-        // fixa o comportamento REAL da API hoje (nenhum resultado), não o comportamento desejável.
+        // Given
         var projeto = ProjetoFactory.Criar();
 
-        var dividaConsulta = DividaTecnicaFactory.Criar(projeto.Id, "Consulta sem paginacao");
+        var dividaConsulta = DividaTecnicaFactory.Criar(projeto.Id, "Consulta sem paginação");
 
         await UsingContextAsync(async context =>
         {
@@ -285,14 +273,13 @@ public sealed class ListarDividasTecnicasTests : ApiIntegrationTestBase
         });
 
         // When
-        var response = await Client.GetAsync($"/projetos/{projeto.Id}/dividas?busca=paginacao");
+        var response = await Client.GetAsync($"/projetos/{projeto.Id}/dividas?busca=deploy");
 
         // Then
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var corpo = await response.Content.ReadFromJsonAsync<
-            PagedResult<ListarDividasTecnicasResponse>
-        >();
+        var corpo =
+            await response.Content.ReadFromJsonAsync.PagedResult<ListarDividasTecnicasResponse>();
 
         Assert.NotNull(corpo);
         Assert.Empty(corpo!.Itens);
