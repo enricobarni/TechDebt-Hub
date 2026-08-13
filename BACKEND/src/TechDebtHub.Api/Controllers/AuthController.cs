@@ -28,7 +28,7 @@ namespace TechDebtHub.Api.Controllers
         {
             var command = new CadastrarUsuarioCommand(request.Nome, request.Email, request.Senha);
 
-            var response = await handler.HanldeAsync(command, cancellationToken);
+            var response = await handler.HandleAsync(command, cancellationToken);
 
             return StatusCode(StatusCodes.Status201Created, response);
         }

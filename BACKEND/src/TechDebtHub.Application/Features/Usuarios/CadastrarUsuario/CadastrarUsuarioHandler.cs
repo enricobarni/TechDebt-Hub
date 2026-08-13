@@ -26,7 +26,7 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<CadastrarUsuarioResponse> HanldeAsync(
+        public async Task<CadastrarUsuarioResponse> HandleAsync(
             CadastrarUsuarioCommand command,
             CancellationToken cancellationToken
         )
