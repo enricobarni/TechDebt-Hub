@@ -70,11 +70,8 @@ public sealed class CriarProjetoTests : ApiIntegrationTestBase
 
         // Then
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-        // NOTA: o ExceptionHandlingMiddleware define ContentType = "application/problem+json",
-        // porém HttpResponseJsonExtensions.WriteAsJsonAsync (sem o parâmetro "contentType")
-        // sobrescreve o header de volta para "application/json; charset=utf-8". Ver relatório do
-        // agente de testes para detalhes — comportamento real documentado aqui, não o previsto.
-        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
 
         var corpo = await response.Content.ReadAsStringAsync();
         Assert.Contains("Já existe um projeto com esse nome", corpo);
