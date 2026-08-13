@@ -21,8 +21,7 @@ namespace TechDebtHub.Api.Controllers
 
         [HttpPost("register")]
         public async Task<ActionResult<CadastrarUsuarioResponse>> Cadastrar(
-            [FromBody] CadastrarUsuarioRequest request,
-            [FromServices] CadastrarUsuarioHandler handler,
+            CadastrarUsuarioRequest request,
             CancellationToken cancellationToken
         )
         {
