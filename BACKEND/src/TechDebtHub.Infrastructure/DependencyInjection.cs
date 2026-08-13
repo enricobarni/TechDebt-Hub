@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens.Experimental;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Interfaces;
 using TechDebtHub.Infrastructure.Persistence;
@@ -35,6 +37,27 @@ namespace TechDebtHub.Infrastructure
             services.AddScoped<IApplicationDbContext>(serviceProvider =>
                 serviceProvider.GetRequiredService<ApplicationDbContext>()
             );
+
+            services
+                .AddOptions<JwtSettings>()
+                .Bind(configuration.GetSection(JwtSettings.SectionName))
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.Issuer),
+                    "Jwt:Issuer não foi configurado"
+                )
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.Audience),
+                    "Jwt:Audience não foi configurado"
+                )
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.SigningKey),
+                    "Jwt:SigningKey não foi configurado"
+                )
+                .Validate(
+                    settings => settings.ExpirationMinutes > 0,
+                    "Jwt:ExpirationMinutes deve ser maior que zero"
+                )
+                .ValidateOnStart();
 
             services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
 
