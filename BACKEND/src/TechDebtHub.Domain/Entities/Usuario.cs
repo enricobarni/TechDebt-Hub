@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Exceptions;
 
-{ }
-
 namespace TechDebtHub.Domain.Entities
 {
     public class Usuario
