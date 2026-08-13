@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Exceptions;
+
+{ }
 
 namespace TechDebtHub.Domain.Entities
 {
@@ -123,9 +126,34 @@ namespace TechDebtHub.Domain.Entities
                 throw new DomainException("O e-mail deve possuir no máximo 254 caracteres");
             }
 
+            ValidarFormatoEmail(emailPreparado);
+
             Email = emailPreparado;
 
             EmailNormalizado = emailPreparado.ToUpperInvariant();
+        }
+
+        private static void ValidarFormatoEmail(string emailPreparado)
+        {
+            try
+            {
+                var endereco = new MailAddress(emailPreparado);
+
+                var enderecoBate = string.Equals(
+                    endereco.Address,
+                    emailPreparado,
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+                if (!enderecoBate || !endereco.Host.Contains('.'))
+                {
+                    throw new DomainException("O e-mail informado é inválido");
+                }
+            }
+            catch (FormatException)
+            {
+                throw new DomainException("O e-mail informado é inválido");
+            }
         }
 
         private void DefinirSenhaHash(string senhaHash)

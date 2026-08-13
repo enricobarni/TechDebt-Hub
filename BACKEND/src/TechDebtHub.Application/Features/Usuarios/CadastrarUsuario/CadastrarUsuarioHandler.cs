@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Exceptions;
 using TechDebtHub.Application.Interfaces;
+using TechDebtHub.Domain.Common;
 using TechDebtHub.Domain.Entities;
 
 namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
@@ -31,13 +32,14 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
             CancellationToken cancellationToken
         )
         {
-            ValidarEmail(command.Email);
-            ValidarSenha(command.Senha);
+            SenhaValidator.Validar(command.Senha);
 
-            var emailNormalizado = command.Email.Trim().ToUpperInvariant();
+            var senhaHash = _passwordHasher.Hash(command.Senha);
+
+            var usuario = new Usuario(command.Nome, command.Email, senhaHash);
 
             var emailExiste = await _context.Usuarios.AnyAsync(
-                usuario => usuario.EmailNormalizado == emailNormalizado,
+                u => u.EmailNormalizado == usuario.EmailNormalizado,
                 cancellationToken
             );
 
@@ -45,10 +47,6 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
             {
                 throw new ConflictException("Já existe um usuário cadastrado com esse e-mail");
             }
-
-            var senhaHash = _passwordHasher.Hash(command.Senha);
-
-            var usuario = new Usuario(command.Nome, command.Email, senhaHash);
 
             _context.Usuarios.Add(usuario);
 
