@@ -13,6 +13,8 @@ namespace TechDebtHub.Application.Abstractions.Persistence
 
         DbSet<DividaTecnica> DividasTecnicas { get; }
 
+        DbSet<Usuario> Usuarios { get; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
