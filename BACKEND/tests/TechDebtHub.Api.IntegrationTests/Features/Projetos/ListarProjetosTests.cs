@@ -76,20 +76,22 @@ public sealed class ListarProjetosTests : ApiIntegrationTestBase
     }
 
     [Fact]
-    public async Task Get_Projetos_ComFiltroBusca_DeveRetornarApenasProjetosCorrespondentes()
+    public async Task Get_Projetos_ComFiltroBusca_DeveSerCaseInsensitiveEIgnorarAcentos()
     {
-        // Given
-        var projetoTechDebt = ProjetoFactory.Criar("TechDebt Hub");
+        // Given - termo buscado em minúsculas e sem acento; nome salvo em caixa natural, com
+        // acento. Antes do fix (Nome.Contains em vez de NomeNormalizado.Contains), essa busca
+        // nunca era normalizada e dependia inteiramente da collation do provedor de banco.
+        var projetoGestao = ProjetoFactory.Criar("Gestão Técnica");
         var projetoFinanceiro = ProjetoFactory.Criar("Sistema Financeiro");
 
         await UsingContextAsync(async context =>
         {
-            context.Projetos.AddRange(projetoTechDebt, projetoFinanceiro);
+            context.Projetos.AddRange(projetoGestao, projetoFinanceiro);
             await context.SaveChangesAsync();
         });
 
         // When
-        var response = await Client.GetAsync("/projetos?busca=TechDebt");
+        var response = await Client.GetAsync("/projetos?busca=gestao");
 
         // Then
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -98,7 +100,7 @@ public sealed class ListarProjetosTests : ApiIntegrationTestBase
 
         Assert.NotNull(corpo);
         Assert.Single(corpo!.Itens);
-        Assert.Equal(projetoTechDebt.Id, corpo.Itens[0].Id);
+        Assert.Equal(projetoGestao.Id, corpo.Itens[0].Id);
     }
 
     [Fact]

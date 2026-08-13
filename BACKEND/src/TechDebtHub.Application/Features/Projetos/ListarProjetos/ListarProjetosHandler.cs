@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Common.Models;
+using TechDebtHub.Domain.Common;
 
 namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
 {
@@ -46,9 +47,9 @@ namespace TechDebtHub.Application.Features.Projetos.ListarProjetos
 
             if (!string.IsNullOrWhiteSpace(query.Busca))
             {
-                var busca = query.Busca.Trim();
+                var busca = TextNormalizer.NormalizarParaComparacao(query.Busca);
 
-                consulta = consulta.Where(projeto => projeto.Nome.Contains(busca));
+                consulta = consulta.Where(projeto => projeto.NomeNormalizado.Contains(busca));
             }
 
             var totalItens = await consulta.CountAsync(cancellationToken);

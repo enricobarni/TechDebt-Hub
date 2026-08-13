@@ -12,7 +12,12 @@ public sealed class ListarProjetosHandlerTests : ApplicationTestBase
     {
         // Given
         var handler = new ListarProjetosHandler(Context);
-        var query = new ListarProjetosQuery(Busca: null, Arquivado: null, Pagina: 0, TamanhoPagina: 10);
+        var query = new ListarProjetosQuery(
+            Busca: null,
+            Arquivado: null,
+            Pagina: 0,
+            TamanhoPagina: 10
+        );
 
         // When
         Func<Task> acaoPaginaInvalida = () => handler.HandleAsync(query, CancellationToken.None);
@@ -58,7 +63,12 @@ public sealed class ListarProjetosHandlerTests : ApplicationTestBase
         await Context.SaveChangesAsync();
 
         var handler = new ListarProjetosHandler(Context);
-        var query = new ListarProjetosQuery(Busca: null, Arquivado: null, Pagina: 1, TamanhoPagina: 10);
+        var query = new ListarProjetosQuery(
+            Busca: null,
+            Arquivado: null,
+            Pagina: 1,
+            TamanhoPagina: 10
+        );
 
         // When
         var resultado = await handler.HandleAsync(query, CancellationToken.None);
@@ -152,11 +162,12 @@ public sealed class ListarProjetosHandlerTests : ApplicationTestBase
     }
 
     [Fact]
-    public async Task HandleAsync_BuscaComCasingDiferente_NaoDeveEncontrarProjeto()
+    public async Task HandleAsync_BuscaComCasingDiferente_DeveEncontrarProjeto()
     {
-        // O filtro `Nome.Contains(busca)` é traduzido pelo provider Sqlite usando
-        // comparação binária (case-sensitive), diferente do comportamento
-        // case-insensitive do SQL Server. Este teste documenta esse comportamento.
+        // A busca normaliza o termo (maiúsculas, sem acentos) e compara contra
+        // NomeNormalizado, que passa pela mesma normalização na criação do projeto —
+        // por isso a busca é case-insensitive e ignora acentos, independente do
+        // provider de banco (SQLite nos testes, SQL Server em produção).
 
         // Given
         var projeto = ProjetoFactory.Criar("TechDebt Hub");
@@ -175,7 +186,8 @@ public sealed class ListarProjetosHandlerTests : ApplicationTestBase
         var resultado = await handler.HandleAsync(query, CancellationToken.None);
 
         // Then
-        Assert.Equal(0, resultado.TotalItens);
+        var item = Assert.Single(resultado.Itens);
+        Assert.Equal(projeto.Id, item.Id);
     }
 
     [Fact]
