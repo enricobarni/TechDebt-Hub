@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.AspNetCore.Mvc;
@@ -90,7 +91,6 @@ namespace TechDebtHub.Api.Middleware
         )
         {
             context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "application/problem+json";
 
             var problemDetails = new ProblemDetails
             {
@@ -100,7 +100,11 @@ namespace TechDebtHub.Api.Middleware
                 Instance = context.Request.Path,
             };
 
-            await context.Response.WriteAsJsonAsync(problemDetails);
+            await context.Response.WriteAsJsonAsync(
+                problemDetails,
+                options: (JsonSerializerOptions?)null,
+                contentType: "application/problem+json"
+            );
         }
 
         private static async Task HandleValidationExceptionAsync(
@@ -109,7 +113,6 @@ namespace TechDebtHub.Api.Middleware
         )
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/problem+json";
 
             var problemDetail = new HttpValidationProblemDetails(ex.Errors)
             {
@@ -119,7 +122,11 @@ namespace TechDebtHub.Api.Middleware
                 Instance = context.Request.Path,
             };
 
-            await context.Response.WriteAsJsonAsync(problemDetail);
+            await context.Response.WriteAsJsonAsync(
+                problemDetail,
+                options: (JsonSerializerOptions?)null,
+                contentType: "application/problem+json"
+            );
         }
     }
 }
