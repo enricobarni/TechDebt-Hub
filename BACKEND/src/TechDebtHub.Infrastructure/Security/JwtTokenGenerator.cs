@@ -16,25 +16,23 @@ namespace TechDebtHub.Infrastructure.Security
 
         private readonly JwtSettings _settings;
         private readonly JsonWebTokenHandler _tokenHandler;
+        private readonly SigningCredentials _signingCredentials;
 
         public JwtTokenGenerator(IOptions<JwtSettings> options)
         {
             _settings = options.Value;
             _tokenHandler = new JsonWebTokenHandler();
-        }
-
-        public string Generate(Guid usuarioId)
-        {
-            var now = DateTime.UtcNow;
 
             var signingKey = new SymmetricSecurityKey(
                 Convert.FromBase64String(_settings.SigningKey)
             );
 
-            var signingCredentials = new SigningCredentials(
-                signingKey,
-                SecurityAlgorithms.HmacSha256
-            );
+            _signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+        }
+
+        public string Generate(Guid usuarioId)
+        {
+            var now = DateTime.UtcNow;
 
             var tokenDescription = new SecurityTokenDescriptor
             {
@@ -50,7 +48,7 @@ namespace TechDebtHub.Infrastructure.Security
                     [JwtIdClaim] = Guid.NewGuid().ToString(),
                 },
 
-                SigningCredentials = signingCredentials,
+                SigningCredentials = _signingCredentials,
             };
 
             return _tokenHandler.CreateToken(tokenDescription);
