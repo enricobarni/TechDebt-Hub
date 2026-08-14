@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens.Experimental;
@@ -50,8 +51,8 @@ namespace TechDebtHub.Infrastructure
                     "Jwt:Audience não foi configurado"
                 )
                 .Validate(
-                    settings => !string.IsNullOrWhiteSpace(settings.SigningKey),
-                    "Jwt:SigningKey não foi configurado"
+                    settings => IsValidSigningKey(settings.SigningKey),
+                    "Jwt:SigningKey deve ser uma chave Base64 válida com pelo menos 32 bytes"
                 )
                 .Validate(
                     settings => settings.ExpirationMinutes > 0,
@@ -63,6 +64,25 @@ namespace TechDebtHub.Infrastructure
             services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
             return services;
+        }
+
+        private static bool IsValidSigningKey(string signingKey)
+        {
+            if (string.IsNullOrWhiteSpace(signingKey))
+            {
+                return false;
+            }
+
+            try
+            {
+                var keyBytes = Convert.FromBase64String(signingKey);
+
+                return keyBytes.Length >= 32;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }
