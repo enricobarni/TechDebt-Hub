@@ -70,6 +70,15 @@ namespace TechDebtHub.Api.Middleware
                     detail: ex.Message
                 );
             }
+            catch (UnauthorizedException ex)
+            {
+                await HandleExceptionAsync(
+                    context,
+                    StatusCodes.Status401Unauthorized,
+                    title: "Não autorizado",
+                    detail: ex.Message
+                );
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ocorreu um erro não tratado no servidor");
