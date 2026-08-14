@@ -60,6 +60,7 @@ namespace TechDebtHub.Infrastructure
                 .ValidateOnStart();
 
             services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
+            services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
             return services;
         }
