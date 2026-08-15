@@ -16,6 +16,7 @@ namespace TechDebtHub.Infrastructure.Persistence
         public DbSet<Projeto> Projetos => Set<Projeto>();
         public DbSet<DividaTecnica> DividasTecnicas => Set<DividaTecnica>();
         public DbSet<Usuario> Usuarios => Set<Usuario>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
