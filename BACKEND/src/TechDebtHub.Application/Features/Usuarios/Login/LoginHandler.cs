@@ -59,7 +59,7 @@ namespace TechDebtHub.Application.Features.Usuarios.Login
                 throw new UnauthorizedException(CredenciaisInvalidas);
             }
 
-            var acessToken = _jwtTokenGenerator.Generate(usuario.Id);
+            var accessToken = _jwtTokenGenerator.Generate(usuario.Id);
 
             var (refreshTokenValue, refreshTokenExpiration) = _refreshTokenGenerator.Generate();
 
@@ -76,7 +76,7 @@ namespace TechDebtHub.Application.Features.Usuarios.Login
             await _context.SaveChangesAsync(cancellationToken);
 
             return new LoginResponse(
-                acessToken,
+                accessToken,
                 refreshTokenValue,
                 "Bearer",
                 refreshTokenExpiration
