@@ -7,6 +7,7 @@ using TechDebtHub.Api.Contracts.Auth;
 using TechDebtHub.Api.Contracts.Usuarios;
 using TechDebtHub.Application.Features.Usuarios.CadastrarUsuario;
 using TechDebtHub.Application.Features.Usuarios.Login;
+using TechDebtHub.Application.Features.Usuarios.RefreshTokens;
 
 namespace TechDebtHub.Api.Controllers
 {
@@ -16,14 +17,17 @@ namespace TechDebtHub.Api.Controllers
     {
         private readonly CadastrarUsuarioHandler _cadastrarUsuarioHandler;
         private readonly LoginHandler _loginHandler;
+        private readonly RefreshTokensHandler _refreshTokensHandler;
 
         public AuthController(
             CadastrarUsuarioHandler cadastrarUsuarioHandler,
-            LoginHandler loginHandler
+            LoginHandler loginHandler,
+            RefreshTokensHandler refreshTokensHandler
         )
         {
             _cadastrarUsuarioHandler = cadastrarUsuarioHandler;
             _loginHandler = loginHandler;
+            _refreshTokensHandler = refreshTokensHandler;
         }
 
         [HttpPost("register")]
@@ -48,6 +52,19 @@ namespace TechDebtHub.Api.Controllers
             var command = new LoginCommand(request.Email, request.Senha);
 
             var response = await _loginHandler.HandleAsync(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<RefreshTokensResponse>> Refresh(
+            RefreshTokensRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new RefreshTokensCommand(request.RefreshToken);
+
+            var response = await _refreshTokensHandler.HandleAsync(command, cancellationToken);
 
             return Ok(response);
         }
