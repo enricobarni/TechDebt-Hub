@@ -7,6 +7,6 @@ namespace TechDebtHub.Application.Interfaces
 {
     public interface IRefreshTokenGenerator
     {
-        string Generate();
+        (string Token, DateTime DataExpiracao) Generate();
     }
 }
