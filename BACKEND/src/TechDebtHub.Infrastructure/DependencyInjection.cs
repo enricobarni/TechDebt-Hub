@@ -62,6 +62,8 @@ namespace TechDebtHub.Infrastructure
 
             services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
             services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
+            services.AddSingleton<ITokenHasher, Sha256TokenHasher>();
 
             return services;
         }
