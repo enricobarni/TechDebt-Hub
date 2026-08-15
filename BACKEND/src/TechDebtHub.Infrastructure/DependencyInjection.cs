@@ -60,6 +60,15 @@ namespace TechDebtHub.Infrastructure
                 )
                 .ValidateOnStart();
 
+            services
+                .AddOptions<RefreshTokenSettings>()
+                .Bind(configuration.GetSection(RefreshTokenSettings.SectionName))
+                .Validate(
+                    settings => settings.ExpirationDays > 0,
+                    "RefreshToken:ExpirationDays deve ser maior que zero"
+                )
+                .ValidateOnStart();
+
             services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
             services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
