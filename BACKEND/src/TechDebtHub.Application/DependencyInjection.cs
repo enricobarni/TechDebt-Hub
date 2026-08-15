@@ -16,6 +16,7 @@ using TechDebtHub.Application.Features.Projetos.CriarProjeto;
 using TechDebtHub.Application.Features.Projetos.ListarProjetos;
 using TechDebtHub.Application.Features.Usuarios.CadastrarUsuario;
 using TechDebtHub.Application.Features.Usuarios.Login;
+using TechDebtHub.Application.Features.Usuarios.RefreshTokens;
 
 namespace TechDebtHub.Application
 {
@@ -36,6 +37,7 @@ namespace TechDebtHub.Application
             services.AddScoped<ArquivarDividaTecnicaHandler>();
             services.AddScoped<CadastrarUsuarioHandler>();
             services.AddScoped<LoginHandler>();
+            services.AddScoped<RefreshTokensHandler>();
 
             return services;
         }
