@@ -9,36 +9,43 @@ using TechDebtHub.Domain.Entities;
 namespace TechDebtHub.Infrastructure.Persistence.Configuration
 {
     public sealed class TokenConfirmacaoEmailConfiguration
-        : IEntityTypeConfiguration<TokenConfirmacaoEmail>
+        : IEntityTypeConfiguration<CodigoConfirmacaoEmail>
     {
-        public void Configure(EntityTypeBuilder<TokenConfirmacaoEmail> builder)
+        public void Configure(EntityTypeBuilder<CodigoConfirmacaoEmail> builder)
         {
             builder.ToTable("TokensConfirmaçãoEmail");
 
-            builder.HasKey(token => token.Id);
+            builder.HasKey(codigo => codigo.Id);
 
-            builder.Property(token => token.TokenHash).HasMaxLength(64).IsRequired();
+            builder.Property(codigo => codigo.CodigoHash).HasMaxLength(64).IsRequired();
 
-            builder.Property(token => token.DataCriacao).IsRequired();
+            builder.Property(codigo => codigo.DataCriacao).IsRequired();
 
-            builder.Property(token => token.DataExpiracao).IsRequired();
+            builder.Property(codigo => codigo.DataExpiracao).IsRequired();
 
-            builder.Property(token => token.DataUtilizacao).IsRequired(false);
+            builder.Property(codigo => codigo.DataUtilizacao).IsRequired(false);
 
-            builder.Property(token => token.DataRevogacao).IsRequired(false);
+            builder.Property(codigo => codigo.DataRevogacao).IsRequired(false);
+
+            builder.Property(codigo => codigo.TentativasFalhas).IsRequired();
+
+            builder.Property(codigo => codigo.MaximoTentativas).IsRequired();
 
             builder
                 .HasOne<Usuario>()
                 .WithMany()
-                .HasForeignKey(token => token.UsuarioId)
+                .HasForeignKey(codigo => codigo.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(token => token.UsuarioId);
+            builder.HasIndex(codigo => codigo.CodigoHash).IsUnique();
 
-            builder.Ignore(token => token.EstaExpirado);
-            builder.Ignore(token => token.FoiUtilizado);
-            builder.Ignore(token => token.FoiRevogado);
-            builder.Ignore(token => token.EstaAtivo);
+            builder.HasIndex(codigo => codigo.UsuarioId);
+
+            builder.Ignore(codigo => codigo.EstaExpirado);
+            builder.Ignore(codigo => codigo.FoiUtilizado);
+            builder.Ignore(codigo => codigo.FoiRevogado);
+            builder.Ignore(codigo => codigo.AtingiuLimiteTentativa);
+            builder.Ignore(codigo => codigo.EstaAtivo);
         }
     }
 }
