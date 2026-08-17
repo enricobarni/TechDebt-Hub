@@ -17,7 +17,7 @@ namespace TechDebtHub.Application.Abstractions.Persistence
 
         DbSet<RefreshToken> RefreshTokens { get; }
 
-        DbSet<CodigoConfirmacaoEmail> TokenConfirmacaoEmails { get; }
+        DbSet<CodigoConfirmacaoEmail> CodigoConfirmacaoEmails { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
