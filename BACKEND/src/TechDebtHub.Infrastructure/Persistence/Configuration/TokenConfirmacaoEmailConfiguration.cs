@@ -37,9 +37,7 @@ namespace TechDebtHub.Infrastructure.Persistence.Configuration
                 .HasForeignKey(codigo => codigo.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(codigo => codigo.CodigoHash).IsUnique();
-
-            builder.HasIndex(codigo => codigo.UsuarioId);
+            builder.HasIndex(codigo => new { codigo.UsuarioId, codigo.CodigoHash });
 
             builder.Ignore(codigo => codigo.EstaExpirado);
             builder.Ignore(codigo => codigo.FoiUtilizado);
