@@ -7,6 +7,11 @@ namespace TechDebtHub.Application.Interfaces
 {
     public interface IEmailSender
     {
-        Task SendAsync(string destinatario, string assunto, string html);
+        Task SendAsync(
+            string destinatario,
+            string assunto,
+            string html,
+            CancellationToken cancellationToken = default
+        );
     }
 }
