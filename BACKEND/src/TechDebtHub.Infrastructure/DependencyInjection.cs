@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens.Experimental;
+using Resend;
 using TechDebtHub.Application.Abstractions.Persistence;
 using TechDebtHub.Application.Interfaces;
+using TechDebtHub.Infrastructure.Email;
 using TechDebtHub.Infrastructure.Persistence;
 using TechDebtHub.Infrastructure.Security;
 
@@ -69,10 +71,33 @@ namespace TechDebtHub.Infrastructure
                 )
                 .ValidateOnStart();
 
+            services
+                .AddOptions<EmailSettings>()
+                .Bind(configuration.GetSection(EmailSettings.SectionName))
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.ApiKey),
+                    "A API Key de e-mail é obrigatória"
+                )
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.FromEmail),
+                    "O e-mail remetente é obrigatório"
+                )
+                .Validate(
+                    settings => !string.IsNullOrWhiteSpace(settings.FromName),
+                    "O nome do remetente é obrigatório"
+                )
+                .ValidateOnStart();
+
+            services.AddResend(options =>
+            {
+                options.ApiToken = configuration[$"{EmailSettings.SectionName}:ApiKey"]!;
+            });
+
             services.AddSingleton<IPasswordHasher, Argon2idPasswordHasher>();
             services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
             services.AddSingleton<ITokenHasher, Sha256TokenHasher>();
+            services.AddScoped<IEmailSender, ResendEmailSender>();
 
             return services;
         }
