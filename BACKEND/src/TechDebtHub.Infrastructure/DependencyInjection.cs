@@ -88,6 +88,23 @@ namespace TechDebtHub.Infrastructure
                 )
                 .ValidateOnStart();
 
+            services
+                .AddOptions<EmailConfirmationSettings>()
+                .Bind(configuration.GetSection(EmailConfirmationSettings.SectionName))
+                .Validate(
+                    setting => setting.ExpirationMinutes > 0,
+                    "EmailConfirmation:ExpirationMinutes deve ser maior que zero"
+                )
+                .Validate(
+                    settings => settings.MaxAttempts > 0,
+                    "EmailConfirmation:MaxAttempts deve ser maior que zero"
+                )
+                .Validate(
+                    settings => IsValidBase64Key(settings.HmacKey),
+                    "EmailConfirmation:HmacKey deve ser uma chave Base64 válida com pelo menos 32 bytes"
+                )
+                .ValidateOnStart();
+
             services.AddResend(options =>
             {
                 options.ApiToken = configuration[$"{EmailSettings.SectionName}:ApiKey"]!;
@@ -98,6 +115,11 @@ namespace TechDebtHub.Infrastructure
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
             services.AddSingleton<ITokenHasher, Sha256TokenHasher>();
             services.AddScoped<IEmailSender, ResendEmailSender>();
+            services.AddSingleton<
+                IEmailConfirmationCodeGenerator,
+                EmailConfirmationCodeGenerator
+            >();
+            services.AddSingleton<IEmailConfirmationCodeHasher, HmacEmailConfirmationCodeHasher>();
 
             return services;
         }
@@ -114,6 +136,25 @@ namespace TechDebtHub.Infrastructure
                 var keyBytes = Convert.FromBase64String(signingKey);
 
                 return keyBytes.Length >= 32;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        private static bool IsValidBase64Key(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return false;
+            }
+
+            try
+            {
+                var bytes = Convert.FromBase64String(key);
+
+                return bytes.Length >= 32;
             }
             catch (FormatException)
             {
