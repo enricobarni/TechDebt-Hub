@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using TechDebtHub.Api.Authentication;
 using TechDebtHub.Api.Extensions;
 using TechDebtHub.Application;
+using TechDebtHub.Application.Interfaces;
 using TechDebtHub.Infrastructure;
 using TechDebtHub.Infrastructure.Security;
 
@@ -17,10 +19,11 @@ var jwtSettings =
     ?? throw new InvalidOperationException("As configurações JWT não foram encontradas");
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
