@@ -8,12 +8,12 @@ using TechDebtHub.Domain.Entities;
 
 namespace TechDebtHub.Infrastructure.Persistence.Configuration
 {
-    public sealed class TokenConfirmacaoEmailConfiguration
+    public sealed class CodigosConfirmacaoEmailConfiguration
         : IEntityTypeConfiguration<CodigoConfirmacaoEmail>
     {
         public void Configure(EntityTypeBuilder<CodigoConfirmacaoEmail> builder)
         {
-            builder.ToTable("TokensConfirmaçãoEmail");
+            builder.ToTable("CodigosConfirmaçãoEmail");
 
             builder.HasKey(codigo => codigo.Id);
 
