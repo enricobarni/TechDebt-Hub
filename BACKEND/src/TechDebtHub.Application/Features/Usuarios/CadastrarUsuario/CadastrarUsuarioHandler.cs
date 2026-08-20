@@ -17,14 +17,20 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
     {
         private readonly IApplicationDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IEmailConfirmationCodeGenerator _codeGenerator;
+        private readonly IEmailConfirmationCodeHasher _codeHasher;
 
         public CadastrarUsuarioHandler(
             IApplicationDbContext context,
-            IPasswordHasher passwordHasher
+            IPasswordHasher passwordHasher,
+            IEmailConfirmationCodeGenerator codeGenerator,
+            IEmailConfirmationCodeHasher codeHasher
         )
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _codeGenerator = codeGenerator;
+            _codeHasher = codeHasher;
         }
 
         public async Task<CadastrarUsuarioResponse> HandleAsync(
@@ -38,6 +44,17 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
 
             var usuario = new Usuario(command.Nome, command.Email, senhaHash);
 
+            var (codigo, dataExpiracao, maximoTentativas) = _codeGenerator.Generate();
+
+            var codigoHash = _codeHasher.Hash(usuario.Id, codigo);
+
+            var codigoConfirmacao = new CodigoConfirmacaoEmail(
+                usuario.Id,
+                codigoHash,
+                dataExpiracao,
+                maximoTentativas
+            );
+
             var emailExiste = await _context.Usuarios.AnyAsync(
                 u => u.EmailNormalizado == usuario.EmailNormalizado,
                 cancellationToken
@@ -49,6 +66,7 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
             }
 
             _context.Usuarios.Add(usuario);
+            _context.CodigoConfirmacaoEmails.Add(codigoConfirmacao);
 
             await _context.SaveChangesAsync(cancellationToken);
 
