@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,18 +20,21 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
         private readonly IPasswordHasher _passwordHasher;
         private readonly IEmailConfirmationCodeGenerator _codeGenerator;
         private readonly IEmailConfirmationCodeHasher _codeHasher;
+        private readonly IEmailSender _emailSender;
 
         public CadastrarUsuarioHandler(
             IApplicationDbContext context,
             IPasswordHasher passwordHasher,
             IEmailConfirmationCodeGenerator codeGenerator,
-            IEmailConfirmationCodeHasher codeHasher
+            IEmailConfirmationCodeHasher codeHasher,
+            IEmailSender emailSender
         )
         {
             _context = context;
             _passwordHasher = passwordHasher;
             _codeGenerator = codeGenerator;
             _codeHasher = codeHasher;
+            _emailSender = emailSender;
         }
 
         public async Task<CadastrarUsuarioResponse> HandleAsync(
@@ -69,6 +73,27 @@ namespace TechDebtHub.Application.Features.Usuarios.CadastrarUsuario
             _context.CodigoConfirmacaoEmails.Add(codigoConfirmacao);
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            var nome = WebUtility.HtmlEncode(usuario.Nome);
+
+            var html = $"""
+                    <h1>Confirme seu e-mail</h1>
+
+                    <p>Olá, {nome}</p>
+                    <p>Seu código de verificação é:</p>
+
+                    <h2>{codigo}</h2>
+
+                    <p>Esse código expira em breve.</p>
+                    <p>Se você não solicitou esse cadastro, ignore esse e-mail.</p>
+                """;
+
+            await _emailSender.SendAsync(
+                usuario.Email,
+                "Confirme seu e-mail — TechDebtHub",
+                html,
+                cancellationToken
+            );
 
             return new CadastrarUsuarioResponse(usuario.Id, usuario.Nome, usuario.Email);
         }
