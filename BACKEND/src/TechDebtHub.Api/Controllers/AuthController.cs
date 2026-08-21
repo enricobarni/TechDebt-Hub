@@ -8,6 +8,7 @@ using TechDebtHub.Api.Contracts.Auth;
 using TechDebtHub.Api.Contracts.Usuarios;
 using TechDebtHub.Application.Features.Usuarios.BuscarUsuarioAtual;
 using TechDebtHub.Application.Features.Usuarios.CadastrarUsuario;
+using TechDebtHub.Application.Features.Usuarios.ConfirmarEmail;
 using TechDebtHub.Application.Features.Usuarios.Login;
 using TechDebtHub.Application.Features.Usuarios.RefreshTokens;
 
@@ -21,18 +22,21 @@ namespace TechDebtHub.Api.Controllers
         private readonly LoginHandler _loginHandler;
         private readonly RefreshTokensHandler _refreshTokensHandler;
         private readonly BuscarUsuarioAtualHandler _buscarUsuarioAtualHandler;
+        private readonly ConfirmarEmailHandler _confirmarEmailHandler;
 
         public AuthController(
             CadastrarUsuarioHandler cadastrarUsuarioHandler,
             LoginHandler loginHandler,
             RefreshTokensHandler refreshTokensHandler,
-            BuscarUsuarioAtualHandler buscarUsuarioAtualHandler
+            BuscarUsuarioAtualHandler buscarUsuarioAtualHandler,
+            ConfirmarEmailHandler confirmarEmailHandler
         )
         {
             _cadastrarUsuarioHandler = cadastrarUsuarioHandler;
             _loginHandler = loginHandler;
             _refreshTokensHandler = refreshTokensHandler;
             _buscarUsuarioAtualHandler = buscarUsuarioAtualHandler;
+            _confirmarEmailHandler = confirmarEmailHandler;
         }
 
         [HttpPost("register")]
@@ -83,6 +87,19 @@ namespace TechDebtHub.Api.Controllers
             var query = new BuscarUsuarioAtualQuery();
 
             var response = await _buscarUsuarioAtualHandler.HandleAsync(query, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpPost("confirm-email")]
+        public async Task<ActionResult<ConfirmarEmailResponse>> ConfirmarEmail(
+            ConfirmarEmailRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new ConfirmarEmailCommand(request.Email, request.Codigo);
+
+            var response = await _confirmarEmailHandler.HandleAsync(command, cancellationToken);
 
             return Ok(response);
         }
