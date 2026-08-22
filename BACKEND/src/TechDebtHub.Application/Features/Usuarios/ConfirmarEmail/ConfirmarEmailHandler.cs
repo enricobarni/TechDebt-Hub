@@ -12,6 +12,8 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
 {
     public sealed class ConfirmarEmailHandler
     {
+        private const string ConfirmacaoInvalida =
+            "Não foi possível confirmar o e-mail com os dados informados";
         private readonly IApplicationDbContext _context;
         private readonly IEmailConfirmationCodeHasher _codeHasher;
 
@@ -30,7 +32,6 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
         )
         {
             var emailNormalizado = command.Email.Trim().ToUpperInvariant();
-            var codigo = command.Codigo.Trim();
 
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(
                 u => u.EmailNormalizado == emailNormalizado,
@@ -39,12 +40,12 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
 
             if (usuario is null)
             {
-                throw new NotFoundException("Usuário não encontrado");
+                throw new ConflictException(ConfirmacaoInvalida);
             }
 
             if (usuario.EmailConfirmado)
             {
-                throw new ConflictException("O e-mail deste usuário já foi confirmado");
+                throw new ConflictException(ConfirmacaoInvalida);
             }
 
             var confirmacao = await _context
@@ -54,14 +55,12 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
 
             if (confirmacao is null)
             {
-                throw new NotFoundException(
-                    "Não existe um código de confirmação para este usuário"
-                );
+                throw new ConflictException(ConfirmacaoInvalida);
             }
 
             if (!confirmacao.EstaAtivo)
             {
-                throw new ConflictException("O código de confirmação não está mais ativo");
+                throw new ConflictException(ConfirmacaoInvalida);
             }
 
             var codigoHash = _codeHasher.Hash(usuario.Id, command.Codigo);
@@ -78,7 +77,7 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                throw new ConflictException("Código de confirmação inválido");
+                throw new ConflictException(ConfirmacaoInvalida);
             }
 
             usuario.ConfirmarEmail();
