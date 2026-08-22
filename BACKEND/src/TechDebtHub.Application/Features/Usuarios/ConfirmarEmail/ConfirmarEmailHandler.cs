@@ -30,6 +30,7 @@ namespace TechDebtHub.Application.Features.Usuarios.ConfirmarEmail
         )
         {
             var emailNormalizado = command.Email.Trim().ToUpperInvariant();
+            var codigo = command.Codigo.Trim();
 
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(
                 u => u.EmailNormalizado == emailNormalizado,
