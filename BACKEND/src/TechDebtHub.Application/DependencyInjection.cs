@@ -18,6 +18,7 @@ using TechDebtHub.Application.Features.Usuarios.BuscarUsuarioAtual;
 using TechDebtHub.Application.Features.Usuarios.CadastrarUsuario;
 using TechDebtHub.Application.Features.Usuarios.ConfirmarEmail;
 using TechDebtHub.Application.Features.Usuarios.Login;
+using TechDebtHub.Application.Features.Usuarios.ReenviarConfirmacaoEmail;
 using TechDebtHub.Application.Features.Usuarios.RefreshTokens;
 
 namespace TechDebtHub.Application
@@ -42,6 +43,7 @@ namespace TechDebtHub.Application
             services.AddScoped<RefreshTokensHandler>();
             services.AddScoped<BuscarUsuarioAtualHandler>();
             services.AddScoped<ConfirmarEmailHandler>();
+            services.AddScoped<ReenviarConfirmacaoEmailHandler>();
 
             return services;
         }
